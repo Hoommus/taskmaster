@@ -1,0 +1,9 @@
+[submodule "lib/libft"]
+	path = lib/libft
+	url = https://github.com/Hoommus/libft.git
+[submodule "lib/ft_printf"]
+	path = lib/ft_printf
+	url = https://github.com/Hoommus/ft_printf.git
+[submodule "lib/yajl"]
+	path = lib/yajl
+	url = https://github.com/lloyd/yajl.git
