@@ -13,8 +13,7 @@
 #include "shell_script.h"
 #include "shell_script_parser.h"
 
-enum e_token_type	token_class_contextual(const char *str,
-											enum e_token_type prev)
+enum e_token_type	token_class_contextual(const char *str)
 {
 	enum e_token_type	type;
 	int					i;

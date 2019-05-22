@@ -19,7 +19,7 @@
 ** Can you~
 */
 
-#include "twenty_one_sh.h"
+#include "taskmaster_cli.h"
 #include "line_editing.h"
 
 void			carpos_adjust_db(int by)
@@ -31,7 +31,7 @@ void			carpos_adjust_db(int by)
 	i = 0;
 	while (i < POS_CUSTOM2)
 	{
-		g_term->carpos_db[i].row -= by;
+		g_shell->carpos_db[i].row -= by;
 		i++;
 	}
 }
@@ -50,7 +50,7 @@ static void		left_hard(int dist, int *new_c, int *new_r)
 	int		ult_nl;
 	int		penult_nl;
 
-	ult_nl = (int)g_term->buffer->iterator;
+	ult_nl = (int)g_shell->buffer->iterator;
 	while (dist)
 	{
 		ult_nl = ult_nl - 1;
@@ -60,12 +60,12 @@ static void		left_hard(int dist, int *new_c, int *new_r)
 			if (penult_nl < 0)
 				penult_nl = -carpos_get(POS_PROMPT)->col - 1;
 			*new_c = ult_nl - penult_nl - 1;
-			*new_r -= *new_c > g_term->ws_col ? *new_c / g_term->ws_col : 1;
-			*new_c = *new_c > g_term->ws_col ? *new_c % g_term->ws_col : *new_c;
+			*new_r -= *new_c > g_shell->ws_col ? *new_c / g_shell->ws_col : 1;
+			*new_c = *new_c > g_shell->ws_col ? *new_c % g_shell->ws_col : *new_c;
 		}
 		else if (*new_c == 0)
 		{
-			*(new_c) = g_term->ws_col - 1;
+			*(new_c) = g_shell->ws_col - 1;
 			*new_r -= 1;
 		}
 		else
@@ -81,8 +81,8 @@ static void		right_hard(int distance, int *new_col, int *new_row)
 	i = 0;
 	while (i < distance)
 	{
-		if (*new_col >= g_term->ws_col - 1 ||
-			buff_char_at_equals(g_term->buffer->iterator + i, "\n"))
+		if (*new_col >= g_shell->ws_col - 1 ||
+			buff_char_at_equals(g_shell->buffer->iterator + i, "\n"))
 		{
 			*(new_row) += 1;
 			*(new_col) = 0;

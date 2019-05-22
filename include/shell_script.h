@@ -16,7 +16,7 @@
 # include "libft.h"
 # include "ft_printf.h"
 # include <stdbool.h>
-# include "twenty_one_sh.h"
+# include "taskmaster_cli.h"
 
 # define TOKEN_DELIMITERS " \t\r\a"
 # define ISQT(x) (((x) == '\'' || (x) == '"' || (x) == '`') ? (1) : (0))
@@ -58,14 +58,7 @@ enum						e_token_type
 
 enum						e_node_type
 {
-	NODE_PIPE,
-	NODE_SUBSHELL,
 	NODE_SEPARATOR,
-	NODE_OR_IF,
-	NODE_AND_IF,
-	NODE_LOOP_WHILE,
-	NODE_LOOP_FOR,
-	NODE_LOOP_UNTIL,
 	NODE_COMMAND,
 };
 
@@ -94,32 +87,11 @@ typedef struct				s_token
 
 typedef struct				s_node
 {
-	struct s_command		*command;
+	char					**command_args;
 	enum e_node_type		node_type;
 	struct s_node			*left;
 	struct s_node			*right;
 }							t_node;
-
-struct						s_io_rdr_param
-{
-	char					*path;
-	int						fd;
-};
-
-typedef struct				s_io_redirect
-{
-	struct s_io_rdr_param	left;
-	struct s_io_rdr_param	right;
-	enum e_token_type		type;
-}							t_io_rdr;
-
-struct						s_command
-{
-	char		**args;
-	char		**assignments;
-	t_io_rdr	*io_redirects;
-	bool		is_async;
-};
 
 union						u_executor
 {
@@ -147,8 +119,7 @@ void						add_token(t_token **head, t_token **tail,
 t_token						*pop_token(t_token **head, t_token **tail);
 void						free_token(struct s_token *token);
 
-enum e_token_type			token_class_contextual(const char *str,
-														enum e_token_type prev);
+enum e_token_type			token_class_contextual(const char *str);
 void						free_array(void **array);
 
 /*
@@ -158,37 +129,21 @@ void						free_array(void **array);
 char						*strip_escaped_nl_and_comments(char *string);
 
 /*
-** AST Preprocess
-*/
-
-void						run_heredocs(t_node *node);
-
-/*
 ** AST Main
 */
 
 void						run_script(t_token *list_head, bool log_recursion);
-int							exec_command(const t_node *command_node,
-	struct s_context *new_context);
-int							exec_subshell(const t_node *node,
-	struct s_context *new_context);
+int							exec_command(const t_node *command_node);
 int							exec_semicolon_iterative(t_node *parent);
 int							exec_semicolon_recursive(const t_node *parent);
-int							exec_and_if(const t_node *parent);
-int							exec_or_if(const t_node *parent);
 int							exec_node(const t_node *node);
 int							exec_abort(int dummy);
-int							exec_pipeline(const t_node *node);
 
 /*
 ** File reading and executing
 */
 
 int							read_filename(const char *file, char **data);
-
-void						rdr_heredocs(t_context *context, t_io_rdr *rdrs);
-int							alterate_filedes(const struct s_command *command,
-	t_context *cntxt);
 
 /*
 ** Expansions

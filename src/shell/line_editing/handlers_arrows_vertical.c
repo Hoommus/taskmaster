@@ -11,23 +11,23 @@
 /* ************************************************************************** */
 
 #include "line_editing.h"
-#include "twenty_one_sh.h"
+#include "taskmaster_cli.h"
 
 void	handle_alt_up(union u_char key)
 {
 	u_int64_t		threshold;
 	u_int64_t		i;
 
-	threshold = g_term->ws_col;
+	threshold = g_shell->ws_col;
 	if (key.lng != K_ALT_UP)
 		return ;
 	carpos_update(POS_CUSTOM2);
 	carpos_update(POS_CURRENT);
 	i = 0;
-	while (i < threshold && g_term->buffer->iterator != 0)
+	while (i < threshold && g_shell->buffer->iterator != 0)
 	{
 		caret_move(1, D_LEFT);
-		g_term->buffer->iterator--;
+		g_shell->buffer->iterator--;
 		if ((carpos_update(POS_CURRENT)->col <= carpos_get(POS_CUSTOM2)->col &&
 				carpos_get(POS_CURRENT)->row < carpos_get(POS_CUSTOM2)->row))
 			return ;
@@ -37,19 +37,19 @@ void	handle_alt_up(union u_char key)
 
 void	handle_alt_down(union u_char key)
 {
-	const u_int64_t	threshold = g_term->ws_col;
+	const u_int64_t	threshold = g_shell->ws_col;
 	u_int64_t		i;
 
 	if (key.lng != K_ALT_DOWN)
 		return ;
-	if (g_term->buffer->size - g_term->buffer->iterator < threshold)
+	if (g_shell->buffer->size - g_shell->buffer->iterator < threshold)
 		handle_home((union u_char){.lng = K_END});
 	carpos_update(POS_CUSTOM2);
 	i = 0;
-	while (i < threshold && g_term->buffer->iterator != g_term->buffer->size)
+	while (i < threshold && g_shell->buffer->iterator != g_shell->buffer->size)
 	{
 		caret_move(1, D_RIGHT);
-		g_term->buffer->iterator++;
+		g_shell->buffer->iterator++;
 		if (carpos_update(POS_CURRENT)->col == carpos_get(POS_CUSTOM2)->col
 			|| (carpos_get(POS_CURRENT)->col > carpos_get(POS_CUSTOM2)->col &&
 				carpos_get(POS_CURRENT)->row > carpos_get(POS_CUSTOM2)->row))

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "twenty_one_sh.h"
+#include "taskmaster_cli.h"
 #include "line_editing.h"
 
 static t_symbol		*g_pasteboard;
@@ -22,7 +22,7 @@ int					pb_paste(void)
 	i = -1;
 	while (g_pasteboard && g_pasteboard[++i].s[0] != 0)
 	{
-		buff_insert_symbol_at(g_term->buffer->iterator, g_pasteboard + i);
+		buff_insert_symbol_at(g_shell->buffer->iterator, g_pasteboard + i);
 		write(1, g_pasteboard[i].s, ft_strlen(g_pasteboard[i].s));
 	}
 	return (i == (u_int64_t)-1 ? 0 : i);

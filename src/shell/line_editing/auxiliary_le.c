@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "twenty_one_sh.h"
+#include "taskmaster_cli.h"
 #include "line_editing.h"
 
 int		ft_putc(int c)
@@ -35,7 +35,7 @@ void	write_at(int col, int row, const char *string)
 {
 	int		i;
 
-	if (g_term->input_state == STATE_NON_INTERACTIVE || g_term->tty_fd == -1 ||
+	if (g_shell->input_state == STATE_NON_INTERACTIVE || g_shell->tty_fd == -1 ||
 		get_env_v(NULL, "TERM") == NULL)
 		return ;
 	carpos_save_as(POS_CUSTOM1);

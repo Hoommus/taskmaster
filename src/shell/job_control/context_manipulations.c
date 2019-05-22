@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "twenty_one_sh.h"
+#include "taskmaster_cli.h"
 
 void	context_add_fd(t_context *context,
 						const int original,
@@ -33,35 +33,6 @@ void	context_add_fd(t_context *context,
 		while (swap->next)
 			swap = swap->next;
 		swap->next = tmp;
-	}
-}
-
-void	context_remove_ofd(t_context *context, const int original)
-{
-	struct s_fd_lst	*ultimate;
-	struct s_fd_lst	*penultimate;
-
-	penultimate = context->fd_list;
-	ultimate = context->fd_list->next;
-	if (penultimate->original == original)
-	{
-		close(penultimate->current);
-		ft_memdel((void **)&(penultimate->label));
-		ft_memdel((void **)&(penultimate));
-		context->fd_list = ultimate;
-		return ;
-	}
-	while (ultimate)
-	{
-		if (ultimate->original == original)
-		{
-			close(ultimate->current);
-			penultimate->next = ultimate->next;
-			ft_memdel((void **)&(ultimate->label));
-			return (ft_memdel((void **)&ultimate));
-		}
-		penultimate = ultimate;
-		ultimate = ultimate->next;
 	}
 }
 

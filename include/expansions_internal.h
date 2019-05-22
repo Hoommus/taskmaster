@@ -26,7 +26,6 @@ struct						s_expansion
 };
 
 char						*expand_tilde(char *str);
-char						*expand_vars(char *str);
 char						*expand_escaped(char *str);
 char						*expand_quotes(char *str);
 

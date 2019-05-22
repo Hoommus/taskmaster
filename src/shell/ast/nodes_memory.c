@@ -19,7 +19,7 @@ t_node	*ast_new_node(void *value, enum e_node_type node_type)
 
 	node = ft_memalloc(sizeof(t_node));
 	node->node_type = node_type;
-	node->command = value;
+	node->command_args = value;
 	return (node);
 }
 
@@ -33,28 +33,6 @@ void	free_arr(void **arr)
 	ft_memdel(arr);
 }
 
-void	ast_free_command_node_internals(t_node *node)
-{
-	struct s_command	*cmd;
-	int					i;
-
-	cmd = node->command;
-	free_arr((void **)cmd->args);
-	free_arr((void **)cmd->assignments);
-	ft_memdel((void **)&(cmd->args));
-	ft_memdel((void **)&(cmd->assignments));
-	i = 0;
-	while (cmd->io_redirects[i].type != TOKEN_NOT_APPLICABLE)
-	{
-		if (cmd->io_redirects[i].left.path)
-			ft_memdel((void **)&(cmd->io_redirects[i].left.path));
-		if (cmd->io_redirects[i].right.path)
-			ft_memdel((void **)&(cmd->io_redirects[i].right.path));
-		i++;
-	}
-	ft_memdel((void **)&(cmd->io_redirects));
-	ft_memdel((void **)&(cmd));
-}
 
 void	ast_free_recursive(t_node *node)
 {
@@ -63,8 +41,9 @@ void	ast_free_recursive(t_node *node)
 	if (node->right != NULL)
 		ast_free_recursive(node->right);
 	if (node->node_type == NODE_COMMAND)
-		ast_free_command_node_internals(node);
-	else
-		ft_memdel((void **)&(node->command));
+	{
+		free_arr((void **)node->command_args);
+		ft_memdel((void **)&(node->command_args));
+	}
 	ft_memdel((void **)&node);
 }

@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "expansions_internal.h"
-#include "twenty_one_sh.h"
+#include "taskmaster_cli.h"
 
 /*
 ** Leave .starting_point empty to enforce running such expansion on any string
@@ -20,12 +20,9 @@
 static const struct s_expansion		g_expansions[] =
 {
 	{"", expand_tilde},
-	{"", expand_vars},
 	{"", expand_escaped},
 	{"", expand_quotes},
 	{NULL, NULL},
-	{"$(", NULL},
-	{"${", NULL},
 };
 
 char								*expand_tilde(char *str)
@@ -38,7 +35,7 @@ char								*expand_tilde(char *str)
 	i = -1;
 	str = ft_strdup(str);
 	len = ft_strlen(str);
-	var = environ_get_entry(g_term->context_current->environ, "HOME");
+	var = environ_get_entry(g_shell->context_current->environ, "HOME");
 	while (++i < len)
 	{
 		if ((i == 0 || ft_strchr("\n\t ", str[i - 1]))

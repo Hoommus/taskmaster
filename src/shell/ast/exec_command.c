@@ -11,132 +11,40 @@
 /* ************************************************************************** */
 
 #include "shell_script.h"
-#include "shell_job_control.h"
+#include "shell_builtins.h"
 
-static char	**split_to_var(const char *str)
+static int				run_builtin(const char **args)
 {
-	char				tmp[1024];
-	int					j;
-	char				**splitted;
+	extern struct s_builtin	g_builtins[];
+	int						i;
 
-	ft_bzero(tmp, sizeof(char) * 1024);
-	splitted = ft_memalloc(sizeof(char *) * 3);
-	j = -1;
-	while (str[++j])
-		if (str[j] == '=')
-		{
-			splitted[0] = ft_strsub(str, 0, j);
-			splitted[1] = ft_strsub(str, j + 1, ft_strlen(str + j + 1));
-			break ;
-		}
-	return (splitted);
-}
-
-static bool	alterate_vars(const struct s_command *command, t_context *context)
-{
-	const char	**assignments = (const char **)command->assignments;
-	char		**splitted;
-	int			scope;
-	int			i;
-
-	if (command->args == NULL || command->args[0] == NULL)
-	{
-		scope = g_term->fallback_input_state == STATE_NON_INTERACTIVE ?
-			SCOPE_SCRIPT_GLOBAL : SCOPE_SHELL_LOCAL;
-		context = g_term->context_original;
-	}
-	else
-		scope = SCOPE_COMMAND_LOCAL;
 	i = 0;
-	while (assignments && assignments[i])
+	while (args && args[0] && g_builtins[i].name)
 	{
-		splitted = split_to_var(assignments[i]);
-		environ_push_entry(context->environ, splitted[0], splitted[1], scope);
-		free_array((void **)splitted);
+		if (ft_strcmp(args[0], g_builtins[i].name) == 0)
+			return (g_builtins[i].function((const char **)args + 1));
 		i++;
 	}
-	return (assignments && assignments[0]);
+	return (-512);
 }
 
-static void	expand_in_rdrs(const struct s_command *command)
+int			exec_command(const t_node *command_node)
 {
-	struct s_io_redirect	*rdrs;
-	char					*swap;
-	int						i;
+	char		**args;
+	int			status;
+	int			i;
+	char		*swap;
 
-	rdrs = command->io_redirects;
+	args = command_node->command_args;
 	i = -1;
-	while (rdrs[++i].type != TOKEN_NOT_APPLICABLE)
+	while (args && args[++i])
 	{
-		if ((swap = rdrs[i].left.path))
-			rdrs[i].left.path = expand(rdrs[i].left.path);
-		ft_memdel((void **)&swap);
-		if ((swap = rdrs[i].right.path))
-			rdrs[i].right.path = expand(rdrs[i].right.path);
-		ft_memdel((void **)&swap);
+		swap = expand(args[i]);
+		ft_memdel((void **)&(args[i]));
+		args[i] = swap;
 	}
-}
-
-/*
-** TODO: Expand backqoutes and $()
-*/
-
-static void	expand_everything(const struct s_command *command)
-{
-	char					*swap;
-	int						i;
-
-	i = -1;
-	while (command->args[++i])
-	{
-		swap = expand(command->args[i]);
-		ft_memdel((void **)&(command->args[i]));
-		command->args[i] = swap;
-	}
-	i = -1;
-	while (command->assignments[++i])
-	{
-		swap = command->assignments[i];
-		command->assignments[i] = expand(command->assignments[i]);
-		ft_memdel((void **)&swap);
-	}
-	expand_in_rdrs(command);
-}
-
-/*
-** If new_context is not NULL, it must have altered stdin and / or stdout,
-** if it was called from pipeline executor. In this case, forknrun routine
-** starts processes without waiting them in any way and shell blocks only
-** when the last process in the pipeline is passed for execution.
-**
-** TODO: optimise (how?..) execution if no variables and fds changes are made
-** TODO: Make copy-on-write-style environ arrays in contexts
-*/
-
-int			exec_command(const t_node *command_node, t_context *new_context)
-{
-	const struct s_command	*command = command_node->command;
-	t_context				*context;
-	enum e_job_state		job_class;
-	int						status;
-
-	job_class = new_context ? JOB_FG : JOB_PIPE;
-	context = new_context ? new_context
-							: context_duplicate(g_term->context_original, true);
-	expand_everything(command);
-	if (alterate_filedes(command, context))
-	{
-		context_deep_free(&context);
-		return (1);
-	}
-	alterate_vars(command, context);
 	status = 0;
-	if (!g_interrupt && command->args != NULL && command->args[0] != NULL)
-	{
-		jc_enqueue_job(jc_create_job(command, context, job_class));
-		status = !new_context ? jc_execute_pipeline_queue() : 0;
-		if (!new_context)
-			jc_destroy_queue();
-	}
+	if (!g_interrupt && args != NULL && args[0] != NULL)
+		status = run_builtin((const char **)args);
 	return (status);
 }

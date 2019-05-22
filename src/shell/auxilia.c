@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "twenty_one_sh.h"
+#include "taskmaster_cli.h"
 #include "line_editing.h"
 
 bool		is_valid_var(const char *var)
@@ -59,12 +59,6 @@ void		display_prompt(enum e_input_state state)
 		ft_printf("quote> ");
 	else if (state == STATE_ESCAPED)
 		ft_printf("> ");
-	else if (state == STATE_HEREDOC)
-		ft_printf("hdoc %s> ", g_term->heredoc_word);
-	else if (state == STATE_HEREDOCD)
-		ft_printf("hdocd %s> ", g_term->heredoc_word);
-	else if (state == STATE_EMPTY_OPERATOR)
-		ft_printf("pipe> ");
 	else
 		ft_printf("err> ");
 	carpos_update(POS_PROMPT);

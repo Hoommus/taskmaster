@@ -23,10 +23,19 @@ const t_rule g_complete_command = {
 	.tree_builder = NULL
 };
 
+const t_rule g_command = {
+	.token = TOKEN_NOT_APPLICABLE,
+	.expands_to = {
+		{&g_simple_command}
+	},
+	.human_readable = "command",
+	.tree_builder = NULL
+};
+
 const t_rule g_list = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
-		{&g_simple_command, &g_list_dash}
+		{&g_command, &g_list_dash}
 	},
 	.human_readable = "list_alt",
 	.tree_builder = NULL
@@ -35,7 +44,7 @@ const t_rule g_list = {
 const t_rule g_list_dash = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
-		{&g_separator, &g_simple_command, &g_list_dash},
+		{&g_separator, &g_command, &g_list_dash},
 		{&g_empty_token}
 	},
 	.human_readable = "list_dash",
@@ -104,8 +113,7 @@ const t_rule g_linebreak = {
 const t_rule g_separator_op = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
-		{&g_semicolon_token},
-		{&g_ampersand_token}
+		{&g_semicolon_token}
 	},
 	.human_readable = "separator_op",
 	.tree_builder = NULL

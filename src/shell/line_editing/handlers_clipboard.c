@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "line_editing.h"
-#include "twenty_one_sh.h"
+#include "taskmaster_cli.h"
 
 void	buffer_redraw_i(u_int64_t from_index)
 {
@@ -35,10 +35,10 @@ void	handle_ctrl_y(union u_char key)
 
 void	handle_ctrl_u(union u_char key)
 {
-	if (key.lng == CKILL && g_term->buffer->size > 0)
+	if (key.lng == CKILL && g_shell->buffer->size > 0)
 	{
 		pb_copy(0, UINT64_MAX);
-		caret_move(g_term->buffer->iterator, D_LEFT);
+		caret_move(g_shell->buffer->iterator, D_LEFT);
 		buff_clear(0);
 		tputs(tgetstr("cd", NULL), 1, &ft_putc);
 	}

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "twenty_one_sh.h"
+#include "taskmaster_cli.h"
 #include "line_editing.h"
 
 /*
@@ -23,7 +23,7 @@ void	buffer_redraw(void)
 
 	carpos_update(POS_CUSTOM1);
 	tputs(tgetstr("cd", NULL), 1, &ft_putc);
-	string = buff_get_part(g_term->buffer->iterator, -1);
+	string = buff_get_part(g_shell->buffer->iterator, -1);
 	ft_printf("%s", string);
 	free(string);
 	carpos_load(POS_CUSTOM1);
@@ -31,6 +31,6 @@ void	buffer_redraw(void)
 
 void	buffer_visual_erase(int from_index)
 {
-	caret_move(g_term->buffer->iterator - from_index, D_LEFT);
+	caret_move(g_shell->buffer->iterator - from_index, D_LEFT);
 	tputs(tgetstr("cd", NULL), 1, &ft_putc);
 }

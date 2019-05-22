@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "shell_history.h"
-#include "twenty_one_sh.h"
+#include "taskmaster_cli.h"
 #include <time.h>
 
 int			deal_with_flags(const char **args)
@@ -50,8 +50,8 @@ static void	clear_history_hard(void)
 	ft_bzero(g_history, sizeof(t_history));
 	free(g_history->entries);
 	free(g_history);
+	ftruncate(g_shell->history_file, 0);
 	history_init_vector(capacity);
-	close_wrapper(init_fd_at_home(HISTORY_FILE, O_TRUNC));
 }
 
 /*

@@ -46,7 +46,6 @@ void						history_push_entry(const char *cmd, time_t stamp);
 void						history_save_entry(int fd);
 void						history_load(int fd);
 u_int64_t					history_get_size(void);
-struct s_history_entry		*history_pop_entry(void);
 struct s_history_entry		*history_get_entry(u_int64_t index);
 char						*history_write(char *command, int history_file);
 

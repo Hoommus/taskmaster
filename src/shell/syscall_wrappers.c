@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "twenty_one_sh.h"
+#include "taskmaster_cli.h"
 
 int		openm_wrapper(const char *path, int oflag, mode_t mode)
 {
@@ -18,7 +18,7 @@ int		openm_wrapper(const char *path, int oflag, mode_t mode)
 
 	fd = open(path, oflag, mode);
 	if (fd != -1)
-		context_add_fd(g_term->context_current, fd, fd, path);
+		context_add_fd(g_shell->context_current, fd, fd, path);
 	return (fd);
 }
 
@@ -29,6 +29,6 @@ int		open_wrapper(const char *path, int oflag)
 
 int		close_wrapper(int filedes)
 {
-	context_remove_fd(g_term->context_current, filedes);
+	context_remove_fd(g_shell->context_current, filedes);
 	return (close(filedes));
 }

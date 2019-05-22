@@ -10,12 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "twenty_one_sh.h"
-
-/*
-** TODO: make checks of fds presence in main context to avoid closing
-**  something like history file
-*/
+#include "taskmaster_cli.h"
 
 void			context_deep_free(t_context **context)
 {
@@ -50,10 +45,10 @@ void			context_switch(t_context *to_which)
 	struct s_fd_lst		*list;
 
 	if (!to_which)
-		to_which = g_term->context_backup;
+		to_which = g_shell->context_backup;
 	else
-		g_term->context_backup = g_term->context_current;
-	g_term->context_current = to_which;
+		g_shell->context_backup = g_shell->context_current;
+	g_shell->context_current = to_which;
 	list = to_which->fd_list;
 	while (list)
 	{
@@ -88,36 +83,6 @@ static void		duplicate_environ(t_context *new_context,
 	}
 }
 
-static void		duplicate_fds(t_context *new, const t_context *context,
-	bool with_dup)
-{
-	struct s_fd_lst		*list;
-	struct s_fd_lst		*new_list;
-	struct s_fd_lst		*tmp;
-
-	new_list = NULL;
-	list = context->fd_list;
-	while (list)
-	{
-		tmp = ft_memalloc(sizeof(struct s_fd_lst));
-		if (list->label)
-			tmp->label = ft_strdup("cloned");
-		tmp->original = list->original;
-		tmp->current = with_dup ? dup(list->current) : list->current;
-		if (!new->fd_list && !new_list)
-		{
-			new->fd_list = tmp;
-			new_list = tmp;
-		}
-		else
-		{
-			new_list->next = tmp;
-			new_list = new_list->next;
-		}
-		list = list->next;
-	}
-}
-
 /*
 ** Creates a full copy of provided context
 ** If with_dup is set to 'true', duplicates all fds with corresponding syscall
@@ -139,6 +104,5 @@ t_context		*context_duplicate(const t_context *context, bool with_dup)
 		duplicate_environ(new, context);
 	else
 		new->environ = context->environ;
-	duplicate_fds(new, context, with_dup);
 	return (new);
 }

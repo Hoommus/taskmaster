@@ -10,28 +10,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "twenty_one_sh.h"
+#include "taskmaster_cli.h"
 
 int					display_normal_prompt(void)
 {
-	t_var	*home;
 	t_var	*user;
-	char	host[1025];
-	char	cwd[1025];
+	char	host[1024];
 	int		size;
 
-	home = get_env_v(NULL, "HOME");
-	getcwd(cwd, 1024);
-	gethostname(host, 1024);
-	if (home && home->value && ft_strcmp(cwd, home->value) == 0 &&
-		(cwd[ft_strlen(cwd)] == '/' || cwd[ft_strlen(cwd)] == 0))
-		ft_strcpy(cwd, "~");
+	gethostname(host, 1023);
 	host[ft_strchr(host, '.') - host] = 0;
 	user = get_env_v(NULL, "USER");
 	size = ft_printf(SHELL_PROMPT,
-		user ? user->value : "$USER", host,
-		ft_strrchr(cwd, '/') == NULL ? cwd
-									: ft_strrchr(cwd, '/') + !!(cwd[1] != '\0'),
-		g_term->last_status ? 31 : 32);
+		user ? user->value : "$USER", host, g_shell->last_status ? 31 : 32);
 	return (size);
 }

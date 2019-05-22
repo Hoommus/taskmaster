@@ -1,30 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtins2.c                                        :+:      :+:    :+:   */
+/*   config_load.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/07/31 14:46:04 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/25 15:35:45 by vtarasiu         ###   ########.fr       */
+/*   Created: 2019/05/21 18:24:56 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/05/21 19:54:59 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "twenty_one_sh.h"
+#include "taskmaster_daemon.h"
+#include "json.h"
 
-int				hs_unsetenv(const char **args)
+void		load_config(const char *filename, bool is_update)
 {
-	int		len;
-	int		i;
+	json_object		*root;
 
-	i = 0;
-	len = 0;
-	while (args[len])
-		len++;
-	if (len == 0)
-		ft_printf("usage:\nunsetenv KEY [KEY ...]\n");
-	else
-		while (i < len)
-			unset_env_v(g_term->context_original->environ, args[i++]);
-	return (0);
+	root = json_object_from_file(filename);
 }

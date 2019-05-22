@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   twenty_one_sh.h                                    :+:      :+:    :+:   */
+/*   taskmaster_cli.h                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/16 13:05:17 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/21 20:59:52 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,11 @@
 # include <limits.h>
 # include <sys/termios.h>
 
+# include <sys/socket.h>
+# include <sys/un.h>
+# include <netdb.h>
+# include <netinet/in.h>
+
 # include "libft.h"
 # include "ft_printf.h"
 # include "buffer_works.h"
@@ -37,7 +42,7 @@
 # include "shell_environ.h"
 
 # ifndef SH
-#  define SH "21sh"
+#  define SH "taskmaster_cli"
 # endif
 
 # define ANSI_RESET "\x1b[0m"
@@ -45,7 +50,7 @@
 # define PROMPT_HOST ANSI_RESET "\x1b[34;1m[%s@%s]\x1b[0m"
 # define PROMPT_PATH " \x1b[36;1m%s\x1b[0m"
 # define PROMPT_TERMINATOR "\x1b[%d;1m $ \x1b[0m"
-# define SHELL_PROMPT PROMPT_HOST PROMPT_PATH PROMPT_TERMINATOR
+# define SHELL_PROMPT PROMPT_HOST PROMPT_TERMINATOR
 
 # define TERM_APPLY_CONFIG(term) tcsetattr(0, TCSANOW, term)
 
@@ -160,13 +165,26 @@ typedef struct			s_position
 	short				row;
 } __attribute__((packed))						t_carpos;
 
+typedef struct			s_remote
+{
+	bool				is_alive;
+	int					domain;
+	int					socket_fd;
+	int					connection_fd;
+	union
+	{
+		struct sockaddr_un	unix;
+		struct sockaddr_in	inet;
+	}					addr;
+}						t_remote;
+
 /*
-** g_term stores terminal parameters as well as cursor position and input buffer
+** g_shell stores terminal parameters as well as cursor position and input buffer
 ** TODO: extract buffer variable to separate global var and create normal API
 ** TODO: consider adding errno-like global variable
 */
 
-struct					s_term
+struct					s_shell
 {
 	enum e_input_state	input_state;
 	enum e_input_state	fallback_input_state;
@@ -188,9 +206,12 @@ struct					s_term
 	struct s_context	*context_backup;
 
 	t_buffer			*buffer;
+
+	t_remote			*daemon;
 };
+
 extern volatile sig_atomic_t	g_interrupt;
-extern struct s_term			*g_term;
+extern struct s_shell			*g_shell;
 
 /*
 ** Init (init.c)

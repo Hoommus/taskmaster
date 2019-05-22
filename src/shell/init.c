@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "twenty_one_sh.h"
+#include "taskmaster_cli.h"
 #include "shell_environ.h"
 #include "line_editing.h"
 
@@ -18,23 +18,23 @@ void			init_shell_context(void)
 {
 	extern const char	**environ;
 
-	g_term = (struct s_term *)ft_memalloc(sizeof(struct s_term));
-	g_term->context_original = ft_memalloc(sizeof(t_context));
-	g_term->context_original->environ =
+	g_shell = (struct s_shell *)ft_memalloc(sizeof(struct s_shell));
+	g_shell->context_original = ft_memalloc(sizeof(t_context));
+	g_shell->context_original->environ =
 		environ_create_vector(VARIABLES_VECTOR_INITIAL_SIZE);
 	if (fcntl(STDIN_FILENO, F_GETFD) != -1)
-		context_add_fd(g_term->context_original, 0, 0, "stdin");
+		context_add_fd(g_shell->context_original, 0, 0, "stdin");
 	if (fcntl(STDOUT_FILENO, F_GETFD) != -1)
-		context_add_fd(g_term->context_original, 1, 1, "stdout");
+		context_add_fd(g_shell->context_original, 1, 1, "stdout");
 	if (fcntl(STDERR_FILENO, F_GETFD) != -1)
-		context_add_fd(g_term->context_original, 2, 2, "stderr");
-	environ_from_array(g_term->context_original->environ, environ);
-	g_term->context_current = context_duplicate(g_term->context_original, true);
-	environ_deallocate_vector(g_term->context_current->environ);
-	free(g_term->context_current->term_config);
-	g_term->context_current->environ = g_term->context_original->environ;
-	g_term->context_current->term_config = init_term();
-	context_switch(g_term->context_current);
+		context_add_fd(g_shell->context_original, 2, 2, "stderr");
+	environ_from_array(g_shell->context_original->environ, environ);
+	g_shell->context_current = context_duplicate(g_shell->context_original, true);
+	environ_deallocate_vector(g_shell->context_current->environ);
+	free(g_shell->context_current->term_config);
+	g_shell->context_current->environ = g_shell->context_original->environ;
+	g_shell->context_current->term_config = init_term();
+	context_switch(g_shell->context_current);
 }
 
 struct termios	*init_term(void)
@@ -45,24 +45,24 @@ struct termios	*init_term(void)
 
 	oldterm = (struct termios *)ft_memalloc(sizeof(struct termios));
 	newterm = (struct termios *)ft_memalloc(sizeof(struct termios));
-	g_term->tty_fd = (short)open_wrapper("/dev/tty", O_RDWR);
-	if (!isatty(STDIN_FILENO) || g_term->tty_fd == -1)
-		g_term->input_state = STATE_NON_INTERACTIVE;
+	g_shell->tty_fd = (short)open_wrapper("/dev/tty", O_RDWR);
+	if (!isatty(STDIN_FILENO) || g_shell->tty_fd == -1)
+		g_shell->input_state = STATE_NON_INTERACTIVE;
 	else
 	{
-		g_term->input_state = STATE_NORMAL;
-		g_term->context_original->term_config = oldterm;
-		tcgetattr(g_term->tty_fd, oldterm);
+		g_shell->input_state = STATE_NORMAL;
+		g_shell->context_original->term_config = oldterm;
+		tcgetattr(g_shell->tty_fd, oldterm);
 		ft_memcpy(newterm, oldterm, sizeof(struct termios));
 		newterm->c_lflag &= ~(ECHO | ICANON | IEXTEN) | ECHOE | ECHONL;
 		newterm->c_iflag &= ~(IXOFF);
 		ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
 		tputs(tgetstr("ei", NULL), 1, &ft_putc);
-		g_term->ws_col = window.ws_col;
-		g_term->ws_row = window.ws_row;
-		close_wrapper(g_term->tty_fd);
+		g_shell->ws_col = window.ws_col;
+		g_shell->ws_row = window.ws_row;
+		close_wrapper(g_shell->tty_fd);
 	}
-	g_term->fallback_input_state = g_term->input_state;
+	g_shell->fallback_input_state = g_shell->input_state;
 	return (newterm);
 }
 
@@ -90,19 +90,19 @@ void			init_files(void)
 
 	var = get_env_v(NULL, "HISTFILE");
 	if (var == NULL || var->value == NULL || ft_strlen(var->value) == 0)
-		g_term->history_file = init_fd_at_home(HISTORY_FILE, 0);
+		g_shell->history_file = init_fd_at_home(HISTORY_FILE, 0);
 	else
-		g_term->history_file = init_fd_at_home(var->value, 0);
+		g_shell->history_file = init_fd_at_home(var->value, 0);
 }
 
 int				parse_args(int argc, char **argv)
 {
-	environ_push_entry(g_term->context_original->environ, "0",
+	environ_push_entry(g_shell->context_original->environ, "0",
 		argv[0], SCOPE_SHELL_LOCAL);
 	if (argc > 1)
 	{
-		g_term->input_state = STATE_NON_INTERACTIVE;
-		g_term->fallback_input_state = STATE_NON_INTERACTIVE;
+		g_shell->input_state = STATE_NON_INTERACTIVE;
+		g_shell->fallback_input_state = STATE_NON_INTERACTIVE;
 	}
 	return (0);
 }

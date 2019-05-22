@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "buffer_works.h"
-#include "twenty_one_sh.h"
+#include "taskmaster_cli.h"
 
 t_buffer		*g_buffer;
 
@@ -24,7 +24,7 @@ void			init_buffer_vector(u_int64_t capacity)
 			* (capacity + 1));
 	g_buffer->capacity = capacity;
 	g_buffer->iterator = 0;
-	g_term->buffer = g_buffer;
+	g_shell->buffer = g_buffer;
 }
 
 static void		reallocate_buffer_vector(void)

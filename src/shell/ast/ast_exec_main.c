@@ -61,16 +61,15 @@ void				run_script(t_token *list_head, bool log_recursion)
 		state.list_offset->prev->type == TOKEN_NEWLINE)
 		state.list_offset = state.list_offset->next;
 	if (state.list_offset != NULL)
-		g_term->last_status = (ft_dprintf(2, ERR_SYNTAX_AT_LINE,
+		g_shell->last_status = (ft_dprintf(2, ERR_SYNTAX_AT_LINE,
 			ft_strcmp(state.list_offset->value, "\n") == 0 ? "\\n" :
 			state.list_offset->value, state.list_offset->line_nbr) & 0) | 1;
 	if (result.ast && state.list_offset == NULL)
 	{
-		run_heredocs(result.ast->root);
 		if (!g_interrupt)
-			g_term->last_status = exec_semicolon_iterative(result.ast->root);
+			g_shell->last_status = exec_semicolon_iterative(result.ast->root);
 		else
-			g_term->last_status = 1;
+			g_shell->last_status = 1;
 	}
 	free_all(&state, &result);
 }

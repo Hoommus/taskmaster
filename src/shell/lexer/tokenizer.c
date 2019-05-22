@@ -120,14 +120,12 @@ static char					*next_token(const char *str, const char *delims)
 ** classification
 */
 
-static struct s_token		*create_token(const char *str, t_token *last,
-	int line)
+static struct s_token		*create_token(const char *str, int line)
 {
 	enum e_token_type	type;
 	t_token				*token;
 
-	type = token_class_contextual(str, last == NULL ? TOKEN_SEMICOLON
-													: last->type);
+	type = token_class_contextual(str);
 	token = new_token(ft_strdup(str), type);
 	token->line_nbr = line;
 	return (token);
@@ -157,11 +155,11 @@ struct s_token				*tokenize(char *string, const char *delimiters)
 		token_value = next_token(string + i, delimiters);
 		line += ft_strcmp(token_value, "\n") == 0 ? 1 : 0;
 		add_token(&head, &tail,
-			create_token(token_value, pop_token(&head, &tail), line));
+			create_token(token_value, line));
 		i += ft_strlen(token_value) - 1;
 		free(token_value);
 	}
 	if (!tail || (tail->type != TOKEN_SEMICOLON && tail->type != TOKEN_NEWLINE))
-		add_token(&head, &tail, create_token("\n", tail, line));
+		add_token(&head, &tail, create_token("\n", line));
 	return (head);
 }

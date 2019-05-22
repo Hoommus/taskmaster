@@ -10,51 +10,63 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME = 21sh
+NAME = taskmaster-cli
 
 CC = clang
 
 FDS = shell(ulimit -n)
 
-FLAGS = -O1 -DSH=\"$(NAME)\" \
+FLAGS = -DSH=\"$(NAME)\" \
                -Wall  \
                -Wextra \
-               -Werror
+               -Werror -g
 
-HEADER = -I include/ -I printf/include -I libft/
-SRC_DIR = ./src/
+LIB_DIR = ../../lib
+
+LIB_INCLUDE = -I $(LIB_DIR)/libft -I $(LIB_DIR)/ft_printf/include
+
+HEADER = -I ../../include/ $(LIB_INCLUDE)
+SRC_DIR = ./
 OBJ_DIR = ./obj/
 
-LIB_DIR = ./printf
-LIB_NAME = libftprintf.a
+PRINTF_DIR = $(LIB_DIR)/ft_printf
+PRINTF_LIB_NAME = libftprintf.a
 
-SHELL_SRC = main.c init.c memory.c auxilia.c       \
-            service_routines.c args_parsing.c string_hash.c \
-            shell_environ.c shell_environ_tools.c shell_environ_vector.c \
-            shell_environ_memory.c \
+SHELL_SRC = args_parsing.c \
+            auxilia.c \
+            main.c \
+            string_hash.c \
+            memory.c \
+            service_routines.c \
+            auxiliary_main.c \
+            compatibility.c \
             syscall_wrappers.c \
-            auxiliary_main.c shell_errors.c
+            init.c \
+            shell_environ.c \
+            shell_environ_tools.c \
+            shell_environ_vector.c \
+            shell_environ_memory.c
 
 LEXER_DIR = lexer/
 LEXER_SRC = tokenizer.c tokens_mem.c token_word_types.c \
             tokenizer_preprocess.c
 
 AST_DIR = ast/
-AST_SRC = ast_exec_main.c ast_exec_preprocess.c \
-          parser.c syntax_rules.c \
-          nodes_memory.c nodes_manipulations.c \
+AST_SRC = ast_exec_main.c \
+          exec_command.c \
           execution.c \
-          exec_command.c exec_command_alterators.c exec_command_heredocs.c \
-          exec_subshell.c \
-          exec_pipeline.c exec_andor_if.c\
-          tree_auxillary.c \
-          tree_simple_command.c tree_simple_command_rdrs.c tree_subshell.c \
-          tree_pipe_sequence.c tree_and_or.c tree_list.c
+          nodes_manipulations.c \
+          nodes_memory.c \
+          parser.c \
+          syntax_rules.c \
+          tree_list.c \
+          tree_simple_command.c
 
 BUILTIN_DIR = builtins/
-BUILTIN_SRC = cd.c where.c builtins.c hs_history.c tokenizer_test.c \
-              syntax_test.c hs_set.c hs_env.c hs_setenv.c hs_unsetenv.c \
-              hs_export.c hs_jobs.c
+BUILTIN_SRC = builtins.c \
+              hs_history.c \
+              tokenizer_test.c \
+              network_connect.c
 
 INTERFACE_DIR = line_editing/
 INTERFACE_SRC = buffer_drawing.c buffer_input.c  \
@@ -70,13 +82,10 @@ INTERFACE_SRC = buffer_drawing.c buffer_input.c  \
 
 JOB_CONTROL_DIR = job_control/
 JOB_CONTROL_SRC = signals_basic.c \
-                  context_manipulations.c context_switch.c \
-                  jc_headquaters.c  \
-                  jc_queue_execution.c jc_queue_forknrun.c jc_queue_interface.c
+                  context_manipulations.c context_switch.c
 
 EXPANSIONS_DIR = expansions/
-EXPANSIONS_SRC = expander_engine.c expand_escaped.c expand_quotes.c \
-                 expand_vars.c
+EXPANSIONS_SRC = expander_engine.c expand_escaped.c expand_quotes.c
 
 HISTORY_DIR = features/history/
 HISTORY_SRC = history.c history_vector.c
@@ -92,10 +101,11 @@ OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o))                         \
 
 all: $(NAME) 
 
-$(NAME): prepare $(OBJ)
-	make -C $(LIB_DIR)
-	cp $(LIB_DIR)/$(LIB_NAME) ./$(LIB_NAME)
-	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(HEADER) $(LIB_NAME) -ltermcap
+$(NAME): prepare $(OBJ) libs
+	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(PRINTF_DIR)/$(PRINTF_LIB_NAME) $(HEADER) -ltermcap
+
+libs: $(PRINTF_DIR)/
+	make -C $<
 
 prepare:
 	@mkdir -p $(OBJ_DIR)$(AST_DIR)
@@ -123,27 +133,14 @@ install:
 	fi ;
 
 clean:
-	make -C libft clean
+	make -C $(PRINTF_DIR) clean
 	@echo "rm -rf $(OBJ_DIR)*.o"
 	@/bin/rm -rf $(OBJ)
 	/bin/rm -rf $(OBJ_DIR)
 
-norme:
-	@echo "<<<===========>>>"
-	norminette $(wildcard $(SRC_DIR)*.c)
-	@echo "<<<===========>>>"
-	norminette $(HEADER)
-	@echo "<<<===========>>>"
-	norminette $(wildcard $(LIB_DIR)/src/*.c)
-	@echo "<<<===========>>>"
-	norminette $(wildcard $(LIB_DIR)/include/*.h)
-	@echo "<<<===========>>>"
-	norminette $(wildcard ./libft/*.c)
-	@echo "<<<===========>>>"
-	norminette $(wildcard ./libft/*.h)
 
 fclean: clean
-	make -C $(LIB_DIR) fclean
+	make -C $(PRINTF_DIR) fclean
 	/bin/rm -f $(NAME)
 	/bin/rm -f $(LIB_NAME)
 
@@ -152,4 +149,4 @@ re: fclean all
 love:
 	@echo "Not all."
 
-.PHONY: clean all fclean re love norme
+.PHONY: clean all fclean re love

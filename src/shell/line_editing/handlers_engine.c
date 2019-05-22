@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "line_editing.h"
-#include "twenty_one_sh.h"
+#include "taskmaster_cli.h"
 
 static const struct s_listener	g_key_hooks[] =
 {
@@ -64,10 +64,10 @@ void							handle_tab(union u_char key)
 
 void							handle_eot(union u_char key)
 {
-	if (key.lng == CEOT && g_term->buffer->size == 0
-						&& g_term->input_state != STATE_HEREDOC)
+	if (key.lng == CEOT && g_shell->buffer->size == 0
+						&& g_shell->input_state != STATE_HEREDOC)
 	{
-		if (g_term->running_process != 0)
+		if (g_shell->running_process != 0)
 		{
 			ft_dprintf(2, ERR_RUNNING_JOBS);
 			display_normal_prompt();
@@ -75,11 +75,11 @@ void							handle_eot(union u_char key)
 		else
 			exit(ft_printf("exit\n") & 0);
 	}
-	else if (key.lng == CEOF && g_term->input_state == STATE_HEREDOC)
+	else if (key.lng == CEOF && g_shell->input_state == STATE_HEREDOC)
 	{
 		ft_dprintf(2, "\n" SH ": warning: here-document delimited "
-			"by end-of-file (wanted `%s')\n", g_term->heredoc_word);
-		g_term->input_state = STATE_COMMIT;
+			"by end-of-file (wanted `%s')\n", g_shell->heredoc_word);
+		g_shell->input_state = STATE_COMMIT;
 	}
 }
 
@@ -91,7 +91,7 @@ void							handle_key(union u_char key)
 	while (g_key_hooks[++i].handler != 0)
 		if (g_key_hooks[i].key.lng == key.lng && g_key_hooks[i].handler)
 		{
-			if ((g_key_hooks[i].states & g_term->input_state) != 0)
+			if ((g_key_hooks[i].states & g_shell->input_state) != 0)
 				g_key_hooks[i].handler(key);
 			break ;
 		}

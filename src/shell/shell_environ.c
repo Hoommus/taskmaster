@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "shell_environ.h"
-#include "twenty_one_sh.h"
+#include "taskmaster_cli.h"
 
 /*
 ** if vector is null, uses current context
@@ -25,7 +25,7 @@ t_var	*get_env_v(t_env_vector *vector, const char *key)
 
 	hash = hash_sdbm(key);
 	if (vector == NULL)
-		vector = g_term->context_current->environ;
+		vector = g_shell->context_current->environ;
 	if (vector == NULL)
 		return (NULL);
 	vars = (t_var *)vector->array;
@@ -40,7 +40,7 @@ int		set_env_v(t_env_vector *vector, const char *key, const char *value,
 	enum e_var_scope scope)
 {
 	if (vector == NULL)
-		vector = g_term->context_current->environ;
+		vector = g_shell->context_current->environ;
 	if (vector == NULL)
 		return (0);
 	return ((int)environ_push_entry(vector, key, value, scope));

@@ -1,21 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   hs_jobs.c                                          :+:      :+:    :+:   */
+/*   daemon_network.h                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/04/08 19:57:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/19 17:50:45 by vtarasiu         ###   ########.fr       */
+/*   Created: 2019/05/21 16:36:47 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/05/21 16:36:47 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "shell_job_control.h"
-#include "twenty_one_sh.h"
+#ifndef DAEMON_NETWORK_H
+# define DAEMON_NETWORK_H
 
-int			hs_jobs(const char **args)
-{
-	ft_printf(SH ": no job control in this shell.\n");
-	args = NULL;
-	return (0);
-}
+
+
+#endif
