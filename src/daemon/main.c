@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:10:31 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/22 15:59:03 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/22 18:34:37 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,8 +87,9 @@ int		main(__unused int argc, __unused  char **argv, __unused char **envp)
 	client_size = sizeof(client);
 	if ((connection = accept(g_master->sockets[0]->fd,
 		(struct sockaddr *)&client, &client_size)) == -1)
-		//dprintf(g_master->logfile, );
-		;
+		dprintf(g_master->logfile, "Connection acceptance from failed\n");
+	else
+		dprintf(g_master->logfile, "%s connected\n", client.);
 	while (read(connection, buffer, sizeof(char) * 1024))
 		write(g_master->logfile, buffer, strlen(buffer));
 	close(g_master->logfile);

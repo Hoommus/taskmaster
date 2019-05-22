@@ -34,6 +34,8 @@ int			connect_socket_unix(void)
 	connection = connect(g_shell->daemon->socket_fd, (struct sockaddr *)unix, sizeof(unix->sun_path));
 	if (connection == -1)
 		dprintf(2, "Failed to connect to local socket @%s\n", SOCKET_FILE);
+	else
+		printf("Connection successful. Socket @%s\n", SOCKET_FILE);
 	return (connection);
 }
 
