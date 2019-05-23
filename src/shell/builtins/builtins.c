@@ -38,10 +38,12 @@ int					hs_echo(const char **args)
 	if (args == NULL || args[0] == NULL)
 	{
 		ft_dprintf(g_shell->daemon->connection_fd, "\n");
+		ft_dprintf(1, "\n");
 		return (0);
 	}
 	str = ft_strarr_join(" ", (char **)args);
 	ft_dprintf(g_shell->daemon->connection_fd, "%s\n", str);
+	ft_dprintf(1, "%s\n", str);
 	free(str);
 	return (0);
 }

@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/05/20 12:51:40 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/05/23 13:49:49 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/05/23 16:09:38 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,9 +26,9 @@ LIB_INCLUDE = -I $(LIB_DIR)/libft \
               -I $(LIB_DIR)/ft_printf/include \
               -I $(LIB_DIR)/json-c
 
-INCLUDE = -I ../../include $(LIB_INCLUDE)
+INCLUDE = -I $(INCLUDE_DIR) $(LIB_INCLUDE)
 
-HEADER = -I ../../include/ $(LIB_INCLUDE)
+HEADER = -I $(INCLUDE_DIR)/ $(LIB_INCLUDE)
 SRC_DIR = ./
 OBJ_DIR = ./obj/
 
@@ -54,7 +54,7 @@ OBJ = $(addprefix $(OBJ_DIR), $(DAEMON_SRC:.c=.o))                        \
 all: $(NAME)
 
 $(NAME): prepare $(OBJ) libs
-	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(PRINTF_DIR)/$(PRINTF_LIB_NAME) $(HEADER) $(JSON_LIB_NAME_STATIC)
+	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(HEADER) $(JSON_LIB_NAME_STATIC) $(PRINTF_DIR)/$(PRINTF_LIB_NAME)
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	$(CC) $(FLAGS) $(HEADER) -o $@ -c $< ;
@@ -65,11 +65,13 @@ prepare:
 
 libs:
 	make -C $(PRINTF_DIR)/
+	if [ ! -f ./$(JSON_LIB_NAME_STATIC) ] ; then ; \
 	cd $(JSON_DIR) ; \
 	sh autogen.sh  ; \
 	./configure    ; \
-	make
-	mv $(JSON_DIR)/.libs/$(JSON_LIB_NAME_STATIC) ./$(JSON_LIB_NAME_STATIC)
+	make ; \
+	fi ;
+	cp $(JSON_DIR)/.libs/$(JSON_LIB_NAME_STATIC) ./$(JSON_LIB_NAME_STATIC)
 
 clean:
 	/bin/rm -rf $(OBJ_DIR)

@@ -30,6 +30,7 @@
 # include <limits.h>
 # include <sys/termios.h>
 
+# include <errno.h>
 # include <sys/socket.h>
 # include <sys/un.h>
 # include <netdb.h>

@@ -46,5 +46,7 @@ int			exec_command(const t_node *command_node)
 	status = 0;
 	if (!g_interrupt && args != NULL && args[0] != NULL)
 		status = run_builtin((const char **)args);
+	if (status == -512)
+		dprintf(2, ERR_COMMAND_NOT_FOUND, args[0]);
 	return (status);
 }
