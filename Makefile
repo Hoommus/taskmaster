@@ -22,14 +22,16 @@ BINARIES = $(SHELL_MODULE)/$(SHELL_BINARY) $(DAEMON_MODULE)/$(DAEMON_BINARY)
 all:
 	make -C $(SHELL_MODULE)
 	make -C $(DAEMON_MODULE)
-	cp $(SHELL_MODULE)/$(SHELL_BINARY) ./$(SHELL_BINARY)
-	cp $(DAEMON_MODULE)/$(DAEMON_BINARY) ./$(DAEMON_BINARY)
+	mv $(SHELL_MODULE)/$(SHELL_BINARY) ./$(SHELL_BINARY)
+	mv $(DAEMON_MODULE)/$(DAEMON_BINARY) ./$(DAEMON_BINARY)
 
 clean:
 	make -C $(SHELL_MODULE) clean
 	make -C $(DAEMON_MODULE) clean
 
-fclean: clean
+fclean:
+	make -C $(SHELL_MODULE) fclean
+	make -C $(DAEMON_MODULE) fclean
 	/bin/rm -f $(SHELL_BINARY)
 	/bin/rm -f $(DAEMON_BINARY)
 

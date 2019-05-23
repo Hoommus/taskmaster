@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:10:31 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/22 18:34:37 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/23 12:49:45 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,10 @@ pid_t	create_daemon(void)
 	return (pid);
 }
 
+// TODO: use TASKMASTERD_CONFIG environment variable or argument for config file specification
+// TODO: make it possible to configure daemon to run in foreground (why?..)
+// TODO: show usage at standard error if no config file specified in any way
+
 int		main(__unused int argc, __unused  char **argv, __unused char **envp)
 {
 	struct sockaddr_storage		client;
@@ -87,9 +91,9 @@ int		main(__unused int argc, __unused  char **argv, __unused char **envp)
 	client_size = sizeof(client);
 	if ((connection = accept(g_master->sockets[0]->fd,
 		(struct sockaddr *)&client, &client_size)) == -1)
-		dprintf(g_master->logfile, "Connection acceptance from failed\n");
+		dprintf(g_master->logfile, "Connection acceptance failed\n");
 	else
-		dprintf(g_master->logfile, "%s connected\n", client.);
+		dprintf(g_master->logfile, "New client connected on fd %d\n", connection);
 	while (read(connection, buffer, sizeof(char) * 1024))
 		write(g_master->logfile, buffer, strlen(buffer));
 	close(g_master->logfile);

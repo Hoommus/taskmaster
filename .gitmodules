@@ -4,3 +4,6 @@
 [submodule "lib/libft"]
 	path = lib/libft
 	url = https://github.com/Hoommus/libft.git
+[submodule "lib/json-c"]
+	path = lib/json-c
+	url = https://github.com/json-c/json-c.git
