@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:13:30 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/22 15:28:29 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/24 12:40:20 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,8 @@
 # include <netdb.h>
 # include <netinet/in.h>
 
-# include <libft.h>
+# include "libft.h"
+# include "taskmaster_common.h"
 
 typedef struct	s_socket
 {
@@ -72,6 +73,8 @@ enum			e_policy
 /*
 ** All of these are signed to allow special value of -1
 */
+
+// TODO: add standard fds alterations
 
 typedef struct	s_job
 {

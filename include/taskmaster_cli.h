@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/21 20:59:52 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/24 12:42:59 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@
 # include "buffer_works.h"
 # include "get_next_line.h"
 # include "shell_environ.h"
+# include "taskmaster_common.h"
 
 # ifndef SH
 #  define SH "taskmaster_cli"
@@ -62,7 +63,7 @@
 # define TERM_DISABLE_APPEARANCE tputs(tgetstr("me", NULL), 1, &ft_putc)
 
 # define HISTORY_FILE "." SH "_history"
-# define CONFIG_FILE "." SH "shrc"
+# define CONFIG_FILE "." SH "rc"
 # define LOG_FILE "." SH ".log"
 
 # define SYNTAX_ERROR ": syntax error near token `%s' on line %d\n"

@@ -6,38 +6,41 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 19:36:29 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/23 16:01:26 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/24 12:34:35 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "taskmaster_cli.h"
-#include <sys/sysctl.h>
 
 #define SOCKET_FILE "/var/tmp/taskmasterd.socket"
 
-// TODO: Check everything for errors
 // TODO: use sysctl() to retrieve information about running taskmasterd processes
-// TODO: destroy socket if failed to connect
 int			connect_socket_unix(void)
 {
 	struct sockaddr_un	*unix;
+	struct s_remote		*daemon;
 	int					connection;
 
-	g_shell->daemon = calloc(1, sizeof(t_remote));
-	unix = &g_shell->daemon->addr.unix;
+	daemon = calloc(1, sizeof(t_remote));
+	unix = &daemon->addr.unix;
 	memset(unix, 0, sizeof(struct sockaddr_un));
 	unix->sun_family = AF_LOCAL;
 	strncpy(unix->sun_path, SOCKET_FILE, sizeof(unix->sun_path) - 1);
-	g_shell->daemon->socket_fd = socket(AF_LOCAL, SOCK_STREAM, 0);
-	if (g_shell->daemon->socket_fd == -1)
+	if ((daemon->socket_fd = socket(AF_LOCAL, SOCK_STREAM, 0)) == -1)
 		dprintf(2, "%s\nsocket @%s\n", strerror(errno), SOCKET_FILE);
-	g_shell->daemon->domain = AF_LOCAL;
-	connection = connect(g_shell->daemon->socket_fd, (struct sockaddr *)unix, sizeof(unix->sun_path));
+	daemon->domain = AF_LOCAL;
+	connection = connect(daemon->socket_fd, (struct sockaddr *)unix, sizeof(unix->sun_path));
 	if (connection == -1)
+	{
 		dprintf(2, "%s\nsocket @%s\n", strerror(errno), SOCKET_FILE);
+		free(daemon);
+	}
 	else
+	{
 		printf("Connection successful. Socket @%s\n", SOCKET_FILE);
-	g_shell->daemon->connection_fd = g_shell->daemon->socket_fd;
+		daemon->is_alive = true;
+		g_shell->daemon = daemon;
+	}
 	return (connection);
 }
 
@@ -47,11 +50,12 @@ int			tm_connect(const char **args)
 	{
 		ft_printf("You are already connected to a ");
 		if (g_shell->daemon->domain == AF_LOCAL)
-			ft_printf("local daemon @%s\n", g_shell->daemon->addr.unix.sun_path);
+			ft_printf("\27[1mlocal\27[0m daemon @%s\n", g_shell->daemon->addr.unix.sun_path);
 		else
-			ft_printf("remote daemon @%u\n",
+			ft_printf("\27[1mremote\27[0m daemon @%u\n",
 				g_shell->daemon->addr.inet.sin_addr.s_addr);
-		ft_printf("Execute `disconnect' command to drop any present connection\n");
+		ft_printf("Execute `disconnect' command to drop any present connection "
+			"(and `connect' again, if needed)\n");
 		return (1);
 	}
 	else if (!args || !args[0])
