@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:13:30 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/24 17:13:56 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/05/27 19:50:13 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,8 @@
 # include <netdb.h>
 # include <netinet/in.h>
 
-# include <libft.h>
+# include "libft.h"
+# include "taskmaster_common.h"
 
 typedef struct	s_socket
 {

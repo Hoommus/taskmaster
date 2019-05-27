@@ -1,25 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   config_load.c                                      :+:      :+:    :+:   */
+/*   taskmaster_common.h                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/05/21 18:24:56 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/23 18:02:32 by vtarasiu         ###   ########.fr       */
+/*   Created: 2019/05/24 12:40:25 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/05/24 13:55:11 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <json_object_private.h>
-#include "taskmaster_daemon.h"
-#include "json.h"
+#ifndef TASKMASTER_COMMON_H
+# define TASKMASTER_COMMON_H
 
-void		load_config(const char *filename, __unused bool is_update)
+# include "json.h"
+
+# ifdef __linux__
+#  undef unix
+# endif
+
+# define RESPONSE_TIMEOUT_USECONDS
+
+enum			e_request
 {
-	json_object						*root;
-	struct json_object_iterator		iter;
+	REQUEST_HEARTBEAT    = 0,
+	REQUEST_STATUS       = 1,
+	REQUEST_STOP         = 2,
+	REQUEST_START        = 4,
+	REQUEST_RESTART      = 8,
+	REQUEST_RESET        = 16,
+	REQUEST_BANISH       = 32,
+	REQUEST_SUMMON       = 64,
 
-	root = json_object_from_file(filename);
-	iter = json_object_iter_begin(root);
-	json_object_iter_peek_name(&iter);
-}
+};
+
+#endif

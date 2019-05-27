@@ -79,6 +79,6 @@ int			hs_history(const char **args)
 	width = width >= 4 ? width : 4;
 	i = 1;
 	while ((entry = history_get_entry(i - 1)))
-		ft_printf("%*llu%1c %s\n", width, i++, ' ', entry->command);
+		ft_printf("%*lu%1c %s\n", width, i++, ' ', entry->command);
 	return (0);
 }

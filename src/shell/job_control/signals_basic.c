@@ -6,10 +6,11 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:46:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/04 16:09:49 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/27 15:15:04 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <signal.h>
 #include "line_editing.h"
 #include "taskmaster_cli.h"
 
@@ -38,6 +39,24 @@ static void				resize(int sig)
 	}
 }
 
+#ifdef __linux__
+
+void					setup_signal_handlers(void)
+{
+	struct sigaction	action;
+
+	ft_bzero(&action, sizeof(struct sigaction));
+	action.sa_handler = &tstp;
+	sigaction(SIGTSTP, &action, NULL);
+	action.sa_handler = &handle_sigint;
+	sigaction(SIGINT, &action, NULL);
+	signal(SIGWINCH, &resize);
+	signal(SIGPIPE, &tstp);
+	signal(SIGCHLD, SIG_DFL);
+}
+
+#elif defined(__APPLE__)
+
 void					setup_signal_handlers(void)
 {
 	struct sigaction	action;
@@ -51,3 +70,5 @@ void					setup_signal_handlers(void)
 	signal(SIGPIPE, &tstp);
 	signal(SIGCHLD, SIG_DFL);
 }
+
+#endif

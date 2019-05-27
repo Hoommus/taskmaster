@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/05/17 12:22:42 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/05/27 15:24:39 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,11 @@ FLAGS = -DSH=\"$(NAME)\" \
 
 LIB_DIR = ../../lib
 
-LIB_INCLUDE = -I $(LIB_DIR)/libft -I $(LIB_DIR)/ft_printf/include
+LIB_INCLUDE = -I $(LIB_DIR)/libft -I $(LIB_DIR)/ft_printf/include -I $(LIB_DIR)/json-c
+
+JSON_DIR = $(LIB_DIR)/json-c
+JSON_LIB_NAME_STATIC = libjson-c.a
+JSON_LIB_NAME_DYNAMIC = libjson-c.dylib
 
 HEADER = -I ../../include/ $(LIB_INCLUDE)
 SRC_DIR = ./
@@ -66,7 +70,7 @@ BUILTIN_DIR = builtins/
 BUILTIN_SRC = builtins.c \
               hs_history.c \
               tokenizer_test.c \
-              network_connect.c
+              network_connect.c daemon_status.c
 
 INTERFACE_DIR = line_editing/
 INTERFACE_SRC = buffer_drawing.c buffer_input.c  \
@@ -102,10 +106,19 @@ OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o))                         \
 all: $(NAME) 
 
 $(NAME): prepare $(OBJ) libs
-	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(PRINTF_DIR)/$(PRINTF_LIB_NAME) $(HEADER) -ltermcap
+	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(PRINTF_DIR)/$(PRINTF_LIB_NAME) $(HEADER) $(JSON_LIB_NAME_STATIC) -ltermcap
 
 libs: $(PRINTF_DIR)/
 	make -C $<
+	if ! [ -f ./$(JSON_LIB_NAME_STATIC) ] ; then \
+	    cd $(JSON_DIR) ; \
+	    if ! [ -f ./configure ] ; then \
+	        sh autogen.sh  ; \
+	    fi ; \
+	    ./configure    ; \
+	    make ; \
+	fi ;
+	cp $(JSON_DIR)/.libs/$(JSON_LIB_NAME_STATIC) ./$(JSON_LIB_NAME_STATIC)
 
 prepare:
 	@mkdir -p $(OBJ_DIR)$(AST_DIR)
@@ -115,12 +128,18 @@ prepare:
 	@mkdir -p $(OBJ_DIR)$(INTERFACE_DIR)
 	@mkdir -p $(OBJ_DIR)$(EXPANSIONS_DIR)
 	@mkdir -p $(OBJ_DIR)$(JOB_CONTROL_DIR)
+	@cd $(JSON_DIR) ; \
+    if ! [ -f ./configure ] ; then \
+        sh autogen.sh >/dev/null ; \
+    fi ; \
+    ./configure >/dev/null
+
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	$(CC) $(FLAGS) $(HEADER) -o $@ -c $< ;
 
 install:
-	@if [ grep ~/.brew/bin $PATH 2>/dev/null ] ; \
+	if [ grep ~/.brew/bin $PATH 2>/dev/null ] ; \
 	then \
 	    mkdir -p ~/.brew/bin/   ; \
 	    cp $(NAME) ~/.brew/bin/ ; \
