@@ -89,6 +89,10 @@
 #  define MAX_FD 4860
 # endif
 
+# if defined(__linux__) && defined(unix)
+#  undef unix
+# endif
+
 # define STATE_UNIVERSAL UINT32_MAX
 
 enum					e_input_state

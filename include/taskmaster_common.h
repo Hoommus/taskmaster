@@ -15,6 +15,10 @@
 
 # include "json.h"
 
+# ifdef __linux__
+#  undef unix
+# endif
+
 # define RESPONSE_TIMEOUT_USECONDS
 
 enum			e_request

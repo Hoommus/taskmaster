@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/05/20 12:51:40 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/05/23 16:09:38 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/05/27 15:22:03 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -65,11 +65,13 @@ prepare:
 
 libs:
 	make -C $(PRINTF_DIR)/
-	if [ ! -f ./$(JSON_LIB_NAME_STATIC) ] ; then ; \
-	cd $(JSON_DIR) ; \
-	sh autogen.sh  ; \
-	./configure    ; \
-	make ; \
+	if ! [ -f ./$(JSON_LIB_NAME_STATIC) ] ; then \
+	    cd $(JSON_DIR) ; \
+	    if ! [ -f ./configure ] ; then \
+	        sh autogen.sh  ; \
+	    fi ; \
+	    ./configure    ; \
+	    make ; \
 	fi ;
 	cp $(JSON_DIR)/.libs/$(JSON_LIB_NAME_STATIC) ./$(JSON_LIB_NAME_STATIC)
 

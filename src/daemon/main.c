@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:10:31 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/23 12:49:45 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/27 15:28:16 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	create_sockets(void)
 pid_t	create_daemon(void)
 {
 	struct rlimit	limits;
-	sigset_t		mask;
+	const sigset_t	mask = {0};
 	pid_t			pid;
 	int32_t			null;
 	u_int64_t		i;
@@ -46,7 +46,6 @@ pid_t	create_daemon(void)
 	if (fork() > 0)
 		exit(EXIT_SUCCESS);
 	dprintf(g_master->logfile, "Successfully forked first time.\n");
-	mask = 0;
 	i = 2;
 	if (getrlimit(RLIMIT_NOFILE, &limits) == 0)
 		while (++i < limits.rlim_cur)
@@ -73,7 +72,7 @@ pid_t	create_daemon(void)
 // TODO: make it possible to configure daemon to run in foreground (why?..)
 // TODO: show usage at standard error if no config file specified in any way
 
-int		main(__unused int argc, __unused  char **argv, __unused char **envp)
+int		main(int argc __attribute__((unused)), char **argv __attribute__((unused)))
 {
 	struct sockaddr_storage		client;
 	int							connection;
