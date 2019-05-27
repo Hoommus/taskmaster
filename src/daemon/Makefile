@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/05/20 12:51:40 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/05/23 16:09:38 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/05/23 17:56:13 by obamzuro         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -39,7 +39,8 @@ JSON_DIR = $(LIB_DIR)/json-c
 JSON_LIB_NAME_STATIC = libjson-c.a
 JSON_LIB_NAME_DYNAMIC = libjson-c.dylib
 
-DAEMON_SRC = main.c
+DAEMON_SRC = main.c\
+			 process_handling.c
 
 CONFIG_DIR = config/
 CONFIG_SRC = config_load.c

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:10:31 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/23 12:49:45 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/24 16:48:34 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,7 @@ int		main(__unused int argc, __unused  char **argv, __unused char **envp)
 	int							connection;
 	u_int32_t					client_size;
 	char						buffer[1024];
+	t_ftvector					jobs;
 
 	remove(SOCKET_FILE);
 	g_master = calloc(1, sizeof(struct s_master));
@@ -87,6 +88,9 @@ int		main(__unused int argc, __unused  char **argv, __unused char **envp)
 	create_daemon();
 	dprintf(g_master->logfile, "Creating sockets...\n");
 	create_sockets();
+
+	process_config(jobs);
+
 	bzero(&client, sizeof(struct sockaddr_storage));
 	client_size = sizeof(client);
 	if ((connection = accept(g_master->sockets[0]->fd,

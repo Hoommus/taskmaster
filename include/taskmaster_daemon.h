@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:13:30 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/22 15:28:29 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/24 17:13:56 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,15 +56,15 @@ struct			s_master
 
 };
 
-enum			e_policy
+typedef enum	e_policyType
 {
-	POLICY_RESTART_ALWAYS,
-	POLICY_RESTART_NEVER,
-	POLICY_RESTART_UNEXPECTED,
-	POLICY_REDIRECT_DISCARD,
-	POLICY_REDIRECT_FILES,
-	POLICY_START_ON_LAUNCH,
-};
+	POLICY_RESTART_ALWAYS = 0b1,
+	POLICY_RESTART_NEVER = 0b10,
+	POLICY_RESTART_UNEXPECTED = 0b100,
+	POLICY_REDIRECT_DISCARD = 0b1000,
+	POLICY_REDIRECT_FILES = 0b10000,
+	POLICY_START_ON_LAUNCH = 0b100000,
+}				t_policyType;
 
 # define ORIGIN_CONFIG 1
 # define ORIGIN_CLIENT 2
@@ -73,9 +73,16 @@ enum			e_policy
 ** All of these are signed to allow special value of -1
 */
 
-typedef struct	s_job
+typedef struct	s_process
 {
 	pid_t		pid;
+	int			state;
+}				t_process;
+
+typedef struct	s_job
+{
+	int			jid;
+	t_process	*processes;
 	char		**args;
 	int64_t		policy;
 	int64_t		job_duplicates;
@@ -87,6 +94,10 @@ typedef struct	s_job
 	char		**environ;
 	char		*working_dir;
 	mode_t		umask;
+
+	char		*in;
+	char		*out;
+	char		*err;
 
 	int8_t		origin;
 }				t_job;
@@ -100,5 +111,19 @@ t_socket		*create_socket(int domain, const char *filename, const char *address);
 int				read_fd(const int fd, char **result);
 int				read_filename(const char *file, char **data);
 
+/*
+** MY TERRITORY
+*/
 
+
+typedef struct	s_ftvector
+{
+	void	**elem;
+	int		capacity;
+	int		len;
+}				t_ftvector;
+int				process_config(t_ftvector jobs);
+void			init_ftvector(t_ftvector *vec);
+void			free_ftvector(t_ftvector *vec);
+void			push_ftvector(t_ftvector *vec, void *line);
 #endif
