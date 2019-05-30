@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/24 12:42:59 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/29 18:29:11 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -270,7 +270,7 @@ ssize_t					ponies_teleported(void);
 int						read_fd(const int fd, char **result);
 bool					is_dir(const char *path);
 bool					is_string_numeric(const char *str, const int base);
-
+_Noreturn int			fatal(const char *const cause);
 /*
 ** Final input parsing (variables_replacement.c)
 */
@@ -313,6 +313,11 @@ int						close_wrapper(int filedes);
 ** Errors
 */
 int						puterr(const char *format, const char *cause);
+
+/*
+** Network interactions
+*/
+int						parse_response_status(const struct s_packet *packet);
 
 /*
 ** Compatibility

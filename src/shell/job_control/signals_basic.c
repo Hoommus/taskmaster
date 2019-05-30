@@ -39,7 +39,7 @@ static void				resize(int sig)
 	}
 }
 
-#ifdef __linux__
+#if defined(__linux__)
 
 void					setup_signal_handlers(void)
 {
