@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/05/20 12:51:40 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/05/27 19:48:59 by obamzuro         ###   ########.fr        #
+#    Updated: 2019/05/29 14:56:32 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,10 +36,14 @@ PRINTF_DIR = $(LIB_DIR)/ft_printf
 PRINTF_LIB_NAME = libftprintf.a
 
 JSON_DIR = $(LIB_DIR)/json-c
+JSON_LIB_DIR = $(JSON_DIR)/.libs
 JSON_LIB_NAME_STATIC = libjson-c.a
 JSON_LIB_NAME_DYNAMIC = libjson-c.dylib
 
-DAEMON_SRC = main.c\
+TASKMASTER_COMMON_DIR = ../common
+TASKMASTER_COMMON_LIB = $(TASKMASTER_COMMON_DIR)/taskmasterlib.a
+
+DAEMON_SRC = main.c \
 			 process_handling.c
 
 CONFIG_DIR = config/
@@ -54,8 +58,12 @@ OBJ = $(addprefix $(OBJ_DIR), $(DAEMON_SRC:.c=.o))                        \
 
 all: $(NAME)
 
+standalone: libs $(NAME)
+
 $(NAME): prepare $(OBJ) libs
-	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(HEADER) $(JSON_LIB_NAME_STATIC) $(PRINTF_DIR)/$(PRINTF_LIB_NAME)
+	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(HEADER) \
+	$(PRINTF_DIR)/$(PRINTF_LIB_NAME) $(JSON_LIB_DIR)/$(JSON_LIB_NAME_STATIC)
+	$(TASKMASTER_COMMON_LIB)
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	$(CC) $(FLAGS) $(HEADER) -o $@ -c $< ;
@@ -65,6 +73,7 @@ prepare:
 	@mkdir -p $(OBJ_DIR)$(NETWORK_DIR)
 
 libs:
+	make -C $(LIBFT_DIR)/
 	make -C $(PRINTF_DIR)/
 	if ! [ -f ./$(JSON_LIB_NAME_STATIC) ] ; then \
 	    cd $(JSON_DIR) ; \
@@ -74,7 +83,6 @@ libs:
 	    ./configure    ; \
 	    make ; \
 	fi ;
-	cp $(JSON_DIR)/.libs/$(JSON_LIB_NAME_STATIC) ./$(JSON_LIB_NAME_STATIC)
 
 clean:
 	/bin/rm -rf $(OBJ_DIR)

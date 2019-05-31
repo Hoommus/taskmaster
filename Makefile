@@ -6,10 +6,9 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/05/18 15:04:56 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/05/27 15:18:22 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/05/29 12:49:01 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
-
 
 SHELL_MODULE = src/shell
 DAEMON_MODULE = src/daemon
@@ -17,20 +16,32 @@ DAEMON_MODULE = src/daemon
 SHELL_BINARY = taskmaster-cli
 DAEMON_BINARY = taskmasterd
 
+PRINTF_DIR = $(LIB_DIR)/ft_printf
+LIBFT_DIR = $(LIB_DIR)/libft
+
 BINARIES = $(SHELL_MODULE)/$(SHELL_BINARY) $(DAEMON_MODULE)/$(DAEMON_BINARY)
 
-all: prepare
+JSON_DIR = $(LIB_DIR)/json-c
+JSON_LIB_NAME_STATIC = libjson-c.a
+JSON_LIB_NAME_DYNAMIC = libjson-c.dylib
+
+all: libs
 	make -C $(SHELL_MODULE)
 	make -C $(DAEMON_MODULE)
 	mv $(SHELL_MODULE)/$(SHELL_BINARY) ./$(SHELL_BINARY)
 	mv $(DAEMON_MODULE)/$(DAEMON_BINARY) ./$(DAEMON_BINARY)
 
-prepare:
-	@cd lib/json-c ; \
-	if ! [ -f ./configure ] ; then \
-	    sh autogen.sh ; \
-	fi ; \
-	./configure >/dev/null ;\
+libs:
+	make -C $(LIBFT_DIR)/
+	make -C $(PRINTF_DIR)/
+	if ! [ -f ./$(JSON_LIB_NAME_STATIC) ] ; then \
+	    cd $(JSON_DIR) ; \
+	    if ! [ -f ./configure ] ; then \
+	        sh autogen.sh  ; \
+	    fi ; \
+	    ./configure    ; \
+	    make ; \
+	fi ;
 
 clean:
 	make -C $(SHELL_MODULE) clean

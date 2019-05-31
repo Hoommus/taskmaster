@@ -57,6 +57,10 @@ struct			s_master
 
 };
 
+/*
+ * TODO: oi, this name doesn't correspond to The Norme
+ */
+
 typedef enum	e_policyType
 {
 	POLICY_RESTART_ALWAYS = 0b1,
@@ -111,6 +115,7 @@ extern struct s_master		*g_master;
 const t_socket	*register_socket(const t_socket *socket);
 
 t_socket		*create_socket(int domain, const char *filename, const char *address);
+void			accept_receive_respond_loop(void);
 
 int				read_fd(const int fd, char **result);
 int				read_filename(const char *file, char **data);

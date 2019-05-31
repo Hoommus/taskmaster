@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/24 12:34:01 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/26 17:07:08 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/29 17:29:28 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,87 +31,50 @@ char		*pack_to_json_str(enum e_request type, const char **args)
 	return ((char *)final);
 }
 
-int			try_sending_all(const char *request)
+int			parse_response_status(const struct s_packet *packet)
 {
-	const int		socket = g_shell->daemon->socket_fd;
-	const char		*copy;
-	ssize_t			last_write;
-	size_t			packet_left;
-
-	copy = request;
-	packet_left = strlen(request);
-	while ((last_write = write(socket, copy, packet_left)))
-	{
-		if (last_write == -1)
-			continue ;
-		copy += last_write;
-		packet_left = strlen(copy);
-	}
-	return (0);
-}
-
-int			try_receive_response(char **result)
-{
-	char		*response;
-	char		*tmp;
-	char		buffer[1024];
-	int			retries;
-	ssize_t		status;
-
-	status = 0;
-	retries = 0;
-	response = ft_strnew(0);
-	while (retries < 5 && memset(buffer, 0, sizeof(buffer)))
-		if ((status = read(g_shell->daemon->socket_fd, buffer, 1023)) == -1)
-			sleep(1 << retries++);
-		else if (status > 0)
-		{
-			tmp = ft_strings_join(2, "", response, buffer);
-			free((void *)response);
-			response = tmp;
-			retries = 0;
-		}
-		else if (status == 0)
-			break ;
-	if (status == -1)
-		printf("Response receive failed: %s", strerror(errno));
-	*result = response;
-	return (status == -1 ? -1 : 0);
-}
-
-int			parse_response_status(char *response)
-{
-	json_object		*object;
-	json_object		*value;
-	int				status;
+	json_object			*value;
+	json_object			*job;
+	int					status;
+	int					i;
+	int					len;
 
 	status = -1;
-	object = json_tokener_parse(response);
-	if (json_object_object_get_ex(object, "status", &value))
+	if (json_object_object_get_ex(packet->json_content, "status", &value))
 		status = json_object_get_int(value);
 	json_object_put(value);
-	json_object_put(object);
+	if (json_object_object_get_ex(packet->json_content, "jobs", &value))
+	{
+		i = -1;
+		len = json_object_array_length(value);
+		while (++i < len)
+		{
+			job = json_object_array_get_idx(value, i);
+			printf("name: %s\n", json_object_get_string(json_object_object_get(job, "name")));
+			printf("%-20s %d\n", "instances:", json_object_get_int(json_object_object_get(job, "instances")));
+		}
+	}
+	//json_object_put(object); TODO: Consider freeing of objects
 	return (status);
 }
 
-int						tm_status(const char **args)
+int			tm_status(const char **args)
 {
 	char	*request;
 	char	*response;
 	int		status;
 
+	status = -1;
 	response = NULL;
 	if (args && args[0] && strcmp(args[0], "--help") == 0)
 		printf("Usage goes here\n");
 	else
 	{
 		request = pack_to_json_str(REQUEST_STATUS, args);
-		if (try_sending_all(request) != 0)
-			dprintf(2, "Request sending failed with error: %s\n", strerror(errno));
-		else
-			try_receive_response(&response);
-		if ((status = parse_response_status(response) == 0))
-			printf("Hello, nice to reply with 0");
+		if (net_send(g_shell->daemon->socket_fd, request) != 0)
+			dprintf(2, SH ": failed to send request: %s\n", strerror(errno));
+		else if (net_get(g_shell->daemon->socket_fd) == 0)
+			status = packet_resolve_first(REQUEST_STATUS);
 		free((void *)response);
 		free((void *)request);
 		return (status);

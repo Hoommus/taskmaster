@@ -13,6 +13,11 @@
 #include "taskmaster_cli.h"
 #include "shell_builtins.h"
 
+struct s_resolver	g_resolvers[] = {
+	{REQUEST_STATUS, &parse_response_status},
+	{0, NULL}
+};
+
 struct s_builtin	g_builtins[] = {
 	{"connect", &tm_connect},
 	{"disconnect", &tm_disconnect},
