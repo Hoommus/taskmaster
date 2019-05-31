@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:10:31 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/27 19:48:52 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/05/31 14:08:31 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #define SOCKET_FILE "/var/tmp/taskmasterd.socket"
 
 struct s_master		*g_master;
+t_ftvector			*g_jobs;
 
 // TODO: Use port 4242 for tcp
 void	create_sockets(void)
@@ -78,7 +79,6 @@ int		main(int argc __attribute__((unused)), char **argv __attribute__((unused)))
 	int							connection;
 	u_int32_t					client_size;
 	char						buffer[1024];
-	t_ftvector					jobs;
 
 	remove(SOCKET_FILE);
 	g_master = calloc(1, sizeof(struct s_master));
@@ -87,14 +87,22 @@ int		main(int argc __attribute__((unused)), char **argv __attribute__((unused)))
 	create_daemon();
 	dprintf(g_master->logfile, "Creating sockets...\n");
 	create_sockets();
-
-	process_config(jobs);
-
 	bzero(&client, sizeof(struct sockaddr_storage));
 	client_size = sizeof(client);
-	if ((connection = accept(g_master->sockets[0]->fd,
+
+	g_jobs = (t_ftvector *)malloc(sizeof(t_ftvector))
+	process_handling();
+
+	while ((connection = accept(g_master->sockets[0]->fd,
 		(struct sockaddr *)&client, &client_size)) == -1)
-		dprintf(g_master->logfile, "Connection acceptance failed\n");
+	{
+		if (errno == EAGAIN)
+		{
+			d_restart();
+		}
+		else
+			dprintf(g_master->logfile, "Connection acceptance failed\n");
+	}
 	else
 		dprintf(g_master->logfile, "New client connected on fd %d\n", connection);
 	while (read(connection, buffer, sizeof(char) * 1024))
@@ -102,5 +110,6 @@ int		main(int argc __attribute__((unused)), char **argv __attribute__((unused)))
 	close(g_master->logfile);
 	unlink(SOCKET_FILE);
 	sleep(20);
+	free(g_jobs);
 	return (0);
 }
