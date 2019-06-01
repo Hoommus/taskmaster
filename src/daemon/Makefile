@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/05/20 12:51:40 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/05/29 14:56:32 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/05/31 17:22:45 by obamzuro         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,6 +32,7 @@ HEADER = -I $(INCLUDE_DIR)/ $(LIB_INCLUDE)
 SRC_DIR = ./
 OBJ_DIR = ./obj/
 
+LIBFT_DIR = $(LIB_DIR)/libft
 PRINTF_DIR = $(LIB_DIR)/ft_printf
 PRINTF_LIB_NAME = libftprintf.a
 
@@ -44,7 +45,8 @@ TASKMASTER_COMMON_DIR = ../common
 TASKMASTER_COMMON_LIB = $(TASKMASTER_COMMON_DIR)/taskmasterlib.a
 
 DAEMON_SRC = main.c \
-			 process_handling.c
+			 process_handling.c\
+			 ft_vector.c
 
 CONFIG_DIR = config/
 CONFIG_SRC = config_load.c
@@ -62,8 +64,8 @@ standalone: libs $(NAME)
 
 $(NAME): prepare $(OBJ) libs
 	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(HEADER) \
-	$(PRINTF_DIR)/$(PRINTF_LIB_NAME) $(JSON_LIB_DIR)/$(JSON_LIB_NAME_STATIC)
-	$(TASKMASTER_COMMON_LIB)
+	$(PRINTF_DIR)/$(PRINTF_LIB_NAME) #$(JSON_LIB_DIR)/$(JSON_LIB_NAME_STATIC)
+	#$(TASKMASTER_COMMON_LIB)
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	$(CC) $(FLAGS) $(HEADER) -o $@ -c $< ;
@@ -75,14 +77,14 @@ prepare:
 libs:
 	make -C $(LIBFT_DIR)/
 	make -C $(PRINTF_DIR)/
-	if ! [ -f ./$(JSON_LIB_NAME_STATIC) ] ; then \
-	    cd $(JSON_DIR) ; \
-	    if ! [ -f ./configure ] ; then \
-	        sh autogen.sh  ; \
-	    fi ; \
-	    ./configure    ; \
-	    make ; \
-	fi ;
+#	if ! [ -f ./$(JSON_LIB_NAME_STATIC) ] ; then \
+#	    cd $(JSON_DIR) ; \
+#	    if ! [ -f ./configure ] ; then \
+#	        sh autogen.sh  ; \
+#	    fi ; \
+#	    ./configure    ; \
+#	    make ; \
+#	fi ;
 
 clean:
 	/bin/rm -rf $(OBJ_DIR)

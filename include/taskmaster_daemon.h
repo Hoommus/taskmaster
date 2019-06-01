@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:13:30 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/31 14:02:49 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/05/31 17:24:40 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,18 @@ typedef enum	e_policyType
 //	int			state;
 //}				t_process;
 
+typedef enum	e_state
+{
+	UKNOWN = 0b1,
+	STARTING = 0b10,
+	RUNNING = 0b100,
+	BACKOFF = 0b1000,
+	EXITED = 0b10000,
+	STOPPING = 0b100000,
+	STOPPED = 0b1000000,
+	DIED = 0b10000000
+}				t_state;
+
 typedef struct	s_job
 {
 //	int			jid;
@@ -124,7 +136,7 @@ int				read_filename(const char *file, char **data);
 ** MY TERRITORY
 */
 
-extern t_ftvector			*g_jobs;
+void		process_handling();
 
 typedef struct	s_ftvector
 {
@@ -137,17 +149,7 @@ void			init_ftvector(t_ftvector *vec);
 void			free_ftvector(t_ftvector *vec);
 void			push_ftvector(t_ftvector *vec, void *line);
 
-typedef enum	e_state
-{
-	UKNOWN = 0b1,
-	STARTING = 0b10,
-	RUNNING = 0b100,
-	BACKOFF = 0b1000,
-	EXITED = 0b10000,
-	STOPPING = 0b100000,
-	STOPPED = 0b1000000,
-	DIED = 0b10000000
-}				t_state;
-
 void			d_restart();
+
+extern t_ftvector			*g_jobs;
 #endif

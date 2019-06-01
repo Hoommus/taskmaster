@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/05/18 15:04:56 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/05/29 12:49:01 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/05/31 15:59:10 by obamzuro         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,6 +16,7 @@ DAEMON_MODULE = src/daemon
 SHELL_BINARY = taskmaster-cli
 DAEMON_BINARY = taskmasterd
 
+LIB_DIR = lib/
 PRINTF_DIR = $(LIB_DIR)/ft_printf
 LIBFT_DIR = $(LIB_DIR)/libft
 
@@ -34,14 +35,14 @@ all: libs
 libs:
 	make -C $(LIBFT_DIR)/
 	make -C $(PRINTF_DIR)/
-	if ! [ -f ./$(JSON_LIB_NAME_STATIC) ] ; then \
-	    cd $(JSON_DIR) ; \
-	    if ! [ -f ./configure ] ; then \
-	        sh autogen.sh  ; \
-	    fi ; \
-	    ./configure    ; \
-	    make ; \
-	fi ;
+#	if ! [ -f ./$(JSON_LIB_NAME_STATIC) ] ; then \
+#	    cd $(JSON_DIR) ; \
+#	    if ! [ -f ./configure ] ; then \
+#	        sh autogen.sh  ; \
+#	    fi ; \
+#	    ./configure    ; \
+#	    make ; \
+#	fi ;
 
 clean:
 	make -C $(SHELL_MODULE) clean

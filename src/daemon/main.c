@@ -6,13 +6,13 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:10:31 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/31 14:16:19 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/01 18:55:52 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "taskmaster_daemon.h"
-
 #define SOCKET_FILE "/var/tmp/taskmasterd.socket"
+
 
 struct s_master		*g_master;
 t_ftvector			*g_jobs;
@@ -51,9 +51,7 @@ pid_t	create_daemon(void)
 	sigprocmask(SIG_SETMASK, &mask, NULL);
 	setsid();
 	umask(0);
-	dprintf(g_master->logfile, "Set sigprocmask, sid and umask(0).\n");
-	if ((pid = fork()) > 0)
-		exit(EXIT_SUCCESS);
+	dprintf(g_master->logfile, "Set sigprocmask, sid and umask(0).\n"); if ((pid = fork()) > 0) exit(EXIT_SUCCESS);
 	dprintf(g_master->logfile, "Successfully forked second time, now we're real daemon.\n");
 	null = open("/dev/null", O_RDWR);
 	dup2(0, null);
@@ -71,10 +69,11 @@ pid_t	create_daemon(void)
 // TODO: Don't forget to close sockets inside fork
 
 int		main(int argc __attribute__((unused)), char **argv __attribute__((unused)))
+{
 	struct sockaddr_storage		client;
 	int							connection;
 	u_int32_t					client_size;
-	char						buffer[1024];
+//	char						buffer[1024];
 
 	remove(SOCKET_FILE);
 	g_master = calloc(1, sizeof(struct s_master));
@@ -83,33 +82,23 @@ int		main(int argc __attribute__((unused)), char **argv __attribute__((unused)))
 	create_daemon();
 	dprintf(g_master->logfile, "Creating sockets...\n");
 	create_sockets();
-//<<<<<<< HEAD
-//	bzero(&client, sizeof(struct sockaddr_storage));
-//	client_size = sizeof(client);
+
+	g_jobs = (t_ftvector *)malloc(sizeof(t_ftvector));
+	process_handling();
+	while ((connection = accept(g_master->sockets[0]->fd,
+		(struct sockaddr *)&client, &client_size)) == -1)
+	{
+		if (errno == EAGAIN)
+		{
+			dprintf(g_master->logfile, "EAGAIN connection\n%s\n", strerror(errno));
+			d_restart();
+		}
+		else if (errno == EINTR)
+			dprintf(g_master->logfile, "EINTR connection\n%s\n", strerror(errno));
+		else
+			dprintf(g_master->logfile, "Connection acceptance failed\n%s\n", strerror(errno));
+	}
 //
-//	g_jobs = (t_ftvector *)malloc(sizeof(t_ftvector))
-//	process_handling();
-//
-//	while ((connection = accept(g_master->sockets[0]->fd,
-//		(struct sockaddr *)&client, &client_size)) == -1)
-//	{
-//		if (errno == EAGAIN)
-//		{
-//			d_restart();
-//		}
-//		else
-//			dprintf(g_master->logfile, "Connection acceptance failed\n");
-//	}
-//	else
-//		dprintf(g_master->logfile, "New client connected on fd %d\n", connection);
-//	while (read(connection, buffer, sizeof(char) * 1024))
-//		write(g_master->logfile, buffer, strlen(buffer));
-//	close(g_master->logfile);
-//	unlink(SOCKET_FILE);
-//	sleep(20);
-//	free(g_jobs);
-//=======
-//
-	accept_receive_respond_loop();
+//	accept_receive_respond_loop();
 	return (0);
 }
