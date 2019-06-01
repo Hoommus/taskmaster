@@ -82,24 +82,39 @@ typedef enum	e_policyType
 ** All of these are signed to allow special value of -1
 */
 
-typedef struct	s_process
+//typedef struct	s_process
+//{
+//	pid_t		pid;
+//	int			state;
+//}				t_process;
+
+typedef enum	e_state
 {
-	pid_t		pid;
-	int			state;
-}				t_process;
+	UKNOWN = 0b1,
+	STARTING = 0b10,
+	RUNNING = 0b100,
+	BACKOFF = 0b1000,
+	EXITED = 0b10000,
+	STOPPING = 0b100000,
+	STOPPED = 0b1000000,
+	DIED = 0b10000000
+}				t_state;
 
 typedef struct	s_job
 {
-	int			jid;
-	t_process	*processes;
+//	int			jid;
+	pid_t		pid;
+	t_state		state;
+//	t_process	*processes;
 	char		**args;
 	int64_t		policy;
-	int64_t		job_duplicates;
+	int64_t		program_duplicates;
 	int64_t		successful_start_timeout;
 	int16_t		restart_attempts;
 	int64_t		graceful_stop_timeout;
 	int8_t		graceful_stop_signal;
-	int8_t		*expected_statuses;
+	int8_t		expected_statuses;
+	int8_t		expected_statuses_len;
 	char		**environ;
 	char		*working_dir;
 	mode_t		umask;
@@ -138,6 +153,7 @@ int				respond_status(const struct s_packet *packet);
 ** MY TERRITORY
 */
 
+void		process_handling();
 
 typedef struct	s_ftvector
 {
@@ -149,4 +165,8 @@ int				process_config(t_ftvector jobs);
 void			init_ftvector(t_ftvector *vec);
 void			free_ftvector(t_ftvector *vec);
 void			push_ftvector(t_ftvector *vec, void *line);
+
+void			d_restart();
+
+extern t_ftvector			*g_jobs;
 #endif

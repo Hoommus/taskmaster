@@ -32,6 +32,7 @@ HEADER = -I $(INCLUDE_DIR)/ $(LIB_INCLUDE)
 SRC_DIR = ./
 OBJ_DIR = ./obj/
 
+LIBFT_DIR = $(LIB_DIR)/libft
 PRINTF_DIR = $(LIB_DIR)/ft_printf
 PRINTF_LIB_NAME = libftprintf.a
 
@@ -44,7 +45,7 @@ TASKMASTER_COMMON_DIR = ../common
 TASKMASTER_COMMON_LIB = $(TASKMASTER_COMMON_DIR)/taskmasterlib.a
 
 DAEMON_SRC = main.c \
-			 process_handling.c \
+			 process_handling.c\
 			 ft_vector.c
 
 CONFIG_DIR = config/
