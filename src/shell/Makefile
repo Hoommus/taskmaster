@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/05/29 14:47:18 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/05/31 17:15:27 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ CC = clang
 FLAGS = -DSH=\"$(NAME)\" \
                -Wall  \
                -Wextra \
-               -Werror -g
+               -Werror -g -fsanitize=address
 
 LIB_DIR = ../../lib
 
@@ -130,8 +130,10 @@ libs:
 	    if ! [ -f ./configure ] ; then \
 	        sh autogen.sh  ; \
 	    fi ; \
-	    ./configure    ; \
-	    make ; \
+	    if ! [ -f ./.libs/$(JSON_LIB_NAME_STATIC) ] ; then \
+	    	./configure    ; \
+	    	make ; \
+	    fi \
 	fi ;
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
@@ -151,18 +153,17 @@ install:
 	fi ;
 
 clean:
-	make -C $(PRINTF_DIR) clean
 	@echo "rm -rf $(OBJ_DIR)*.o"
 	@/bin/rm -rf $(OBJ)
 	/bin/rm -rf $(OBJ_DIR)
 
 
 fclean: clean
-	make -C $(PRINTF_DIR) fclean
 	/bin/rm -f $(NAME)
 	/bin/rm -f $(LIB_NAME)
 
-re: fclean all
+re: fclean
+	make all
 
 love:
 	@echo "Not all."

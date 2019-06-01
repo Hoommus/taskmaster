@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:13:30 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/27 19:50:13 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/05/31 16:10:40 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,10 @@
 
 # include "libft.h"
 # include "taskmaster_common.h"
+
+# ifdef TASKMASTER_CLI_H
+#  error You should not include taskmaster_cli.h with taskmaster_daemon.h
+# endif
 
 typedef struct	s_socket
 {
@@ -111,11 +115,24 @@ extern struct s_master		*g_master;
 
 const t_socket	*register_socket(const t_socket *socket);
 
+/*
+** init
+*/
+
 t_socket		*create_socket(int domain, const char *filename, const char *address);
-void			accept_receive_respond_loop(void);
 
 int				read_fd(const int fd, char **result);
 int				read_filename(const char *file, char **data);
+
+/*
+** Network interactions
+*/
+void			accept_receive_respond_loop(void);
+
+int				respond_status(const struct s_packet *packet);
+
+
+
 
 /*
 ** MY TERRITORY

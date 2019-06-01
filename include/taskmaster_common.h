@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/24 12:40:25 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/30 17:54:23 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/31 16:16:29 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,23 @@
 # define TASKMASTER_COMMON_H
 
 # include "json.h"
+# include <stdbool.h>
+# include <string.h>
 # include <time.h>
 # include <sys/time.h>
+# include <sys/socket.h>
+# include <sys/un.h>
+# include <netdb.h>
+# include <netinet/in.h>
+# include <errno.h>
+
+# include "libft.h"
 
 # ifdef __linux__
 #  undef unix
 # endif
+
+#define PACKET_DELIMITER 23
 
 # define RESPONSE_TIMEOUT_USECONDS
 
@@ -58,17 +69,40 @@ struct				s_resolver
 	t_resolver_fun resolver;
 };
 
+enum				e_remote
+{
+	REMOTE_UNIX,
+	REMOTE_INET,
+	REMOTE_CLIENT,
+	REMOTE_NOT_APPLICABLE
+};
+
+typedef struct			s_remote_alt
+{
+	bool				is_alive;
+	enum e_remote		type;
+	int					sock_stream_fd;
+	union
+	{
+		struct sockaddr_un			unix;
+		struct sockaddr_in			inet;
+		struct sockaddr_storage		client;
+	}					addr;
+}						t_remote_alt;
+
+
 extern struct s_resolver	g_resolvers[];
 
 struct s_packet	*packet_create(const char *contents, struct timeval timestamp);
+struct s_packet	*packet_create_json(json_object *root, enum e_request request, struct timeval timestamp);
 int				packet_enqueue(struct s_packet *packet);
 int				packet_dequeue(struct s_packet *packet);
-int				packet_destroy(struct s_packet **packet);
+int				packet_free(struct s_packet **packet);
 int				packet_resolve(struct s_packet *packet);
 int				packet_resolve_all(void);
 int				packet_resolve_first(enum e_request type);
 
-int				net_send(int socket, const char *request);
+int				net_send(int socket, struct s_packet *packet);
 int				net_get(int socket);
 
 #endif

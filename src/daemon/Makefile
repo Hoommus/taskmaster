@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/05/20 12:51:40 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/05/29 14:56:32 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/05/31 17:08:27 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ CC = clang
 FLAGS = -DSH=\"$(NAME)\" \
                -Wall  \
                -Wextra \
-               -Werror -g
+               -Werror -g -fsanitize=address
 
 LIB_DIR = ../../lib
 INCLUDE_DIR = ../../include
@@ -44,13 +44,14 @@ TASKMASTER_COMMON_DIR = ../common
 TASKMASTER_COMMON_LIB = $(TASKMASTER_COMMON_DIR)/taskmasterlib.a
 
 DAEMON_SRC = main.c \
-			 process_handling.c
+			 process_handling.c \
+			 ft_vector.c
 
 CONFIG_DIR = config/
 CONFIG_SRC = config_load.c
 
 NETWORK_DIR = network/
-NETWORK_SRC = sockets_manipulations.c
+NETWORK_SRC = sockets_manipulations.c client_interactions.c
 
 OBJ = $(addprefix $(OBJ_DIR), $(DAEMON_SRC:.c=.o))                        \
       $(addprefix $(OBJ_DIR)$(CONFIG_DIR), $(CONFIG_SRC:.c=.o))           \
@@ -62,7 +63,7 @@ standalone: libs $(NAME)
 
 $(NAME): prepare $(OBJ) libs
 	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(HEADER) \
-	$(PRINTF_DIR)/$(PRINTF_LIB_NAME) $(JSON_LIB_DIR)/$(JSON_LIB_NAME_STATIC)
+	$(PRINTF_DIR)/$(PRINTF_LIB_NAME) $(JSON_LIB_DIR)/$(JSON_LIB_NAME_STATIC) \
 	$(TASKMASTER_COMMON_LIB)
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
@@ -73,15 +74,16 @@ prepare:
 	@mkdir -p $(OBJ_DIR)$(NETWORK_DIR)
 
 libs:
-	make -C $(LIBFT_DIR)/
 	make -C $(PRINTF_DIR)/
 	if ! [ -f ./$(JSON_LIB_NAME_STATIC) ] ; then \
 	    cd $(JSON_DIR) ; \
 	    if ! [ -f ./configure ] ; then \
 	        sh autogen.sh  ; \
 	    fi ; \
-	    ./configure    ; \
-	    make ; \
+	    if ! [ -f ./.libs/$(JSON_LIB_NAME_STATIC) ] ; then \
+	    	./configure    ; \
+	    	make ; \
+	    fi \
 	fi ;
 
 clean:

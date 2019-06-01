@@ -6,17 +6,17 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/24 12:34:01 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/29 17:29:28 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/31 18:33:11 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "taskmaster_cli.h"
 
-char		*pack_to_json_str(enum e_request type, const char **args)
+struct s_packet		*pack_to_packet(enum e_request type, const char **args)
 {
 	json_object		*object;
 	json_object		*tmp;
-	const char		*final;
+	struct timeval	time;
 	int				i;
 
 	object = json_object_new_object();
@@ -26,10 +26,15 @@ char		*pack_to_json_str(enum e_request type, const char **args)
 	while (args && args[i])
 		json_object_array_add(tmp, json_object_new_string(args[i++]));
 	json_object_object_add(object, "argv", tmp);
-	final = json_object_to_json_string(object);
-	json_object_put(object);
-	return ((char *)final);
+	gettimeofday(&time, NULL);
+	return (packet_create_json(object, type, time));
 }
+
+//void		print_job(json_object *job)
+//{
+//	job = NULL;
+//	// TODO
+//}
 
 int			parse_response_status(const struct s_packet *packet)
 {
@@ -39,14 +44,15 @@ int			parse_response_status(const struct s_packet *packet)
 	int					i;
 	int					len;
 
+	printf("Now parsing response\n");
 	status = -1;
 	if (json_object_object_get_ex(packet->json_content, "status", &value))
 		status = json_object_get_int(value);
 	json_object_put(value);
-	if (json_object_object_get_ex(packet->json_content, "jobs", &value))
+	if (json_object_object_get_ex(packet->json_content, "jobs", &value)
+		&& (len = json_object_array_length(value)) > 0)
 	{
 		i = -1;
-		len = json_object_array_length(value);
 		while (++i < len)
 		{
 			job = json_object_array_get_idx(value, i);
@@ -54,15 +60,16 @@ int			parse_response_status(const struct s_packet *packet)
 			printf("%-20s %d\n", "instances:", json_object_get_int(json_object_object_get(job, "instances")));
 		}
 	}
-	//json_object_put(object); TODO: Consider freeing of objects
+	else
+		printf("No jobs.\n");
 	return (status);
 }
 
 int			tm_status(const char **args)
 {
-	char	*request;
-	char	*response;
-	int		status;
+	struct s_packet	*request;
+	char			*response;
+	int				status;
 
 	status = -1;
 	response = NULL;
@@ -70,13 +77,17 @@ int			tm_status(const char **args)
 		printf("Usage goes here\n");
 	else
 	{
-		request = pack_to_json_str(REQUEST_STATUS, args);
+		request = pack_to_packet(REQUEST_STATUS, args);
+		dprintf(2, SH ": sending request...\n");
 		if (net_send(g_shell->daemon->socket_fd, request) != 0)
 			dprintf(2, SH ": failed to send request: %s\n", strerror(errno));
-		else if (net_get(g_shell->daemon->socket_fd) == 0)
-			status = packet_resolve_first(REQUEST_STATUS);
+		else
+		{
+			dprintf(2, SH ": seems like sent all, now waiting for response\n");
+			if (net_get(g_shell->daemon->socket_fd) >= 0)
+				status = packet_resolve_all();
+		}
 		free((void *)response);
-		free((void *)request);
 		return (status);
 	}
 	return (0);

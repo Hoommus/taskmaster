@@ -78,8 +78,10 @@ int			tm_disconnect(const char **args)
 	if (strcmp(args[0], "unix") == 0)
 	{
 		printf("Disconnected from %s\n", g_shell->daemon->addr.unix.sun_path);
-		close(g_shell->daemon->connection_fd);
-		close(g_shell->daemon->socket_fd);
+		if (g_shell->daemon->connection_fd > 2)
+			close(g_shell->daemon->connection_fd);
+		if (g_shell->daemon->socket_fd > 2)
+			close(g_shell->daemon->socket_fd);
 		free(g_shell->daemon);
 		g_shell->daemon = NULL;
 	}

@@ -82,7 +82,7 @@ int			jobs_filler(t_ftvector *jobs)
 	return (0);
 }
 
-int			redirection_substitute(char *filename, int where, int flag)
+int			redirection_substitute(char *filename, __unused int where, __unused int flag)
 {
 	int		fd;
 

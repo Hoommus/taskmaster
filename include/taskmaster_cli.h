@@ -6,12 +6,12 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/29 18:29:11 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/31 16:13:21 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef TWENTY_ONE_SH_H
-# define TWENTY_ONE_SH_H
+#ifndef TASKMASTER_CLI_H
+# define TASKMASTER_CLI_H
 
 # include <fcntl.h>
 # include <string.h>
@@ -91,6 +91,10 @@
 
 # if defined(__linux__) && defined(unix)
 #  undef unix
+# endif
+
+# ifdef TASKMASTER_DAEMON_H
+#  error You should not include taskmaster_daemon.h with taskmaster_cli.h
 # endif
 
 # define STATE_UNIVERSAL UINT32_MAX
