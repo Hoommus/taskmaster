@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:13:30 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/31 16:10:40 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/02 18:34:17 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,9 @@
 
 # include <netdb.h>
 # include <netinet/in.h>
+
+# include <sys/times.h>
+# include <limits.h>
 
 # include "libft.h"
 # include "taskmaster_common.h"
@@ -97,7 +100,7 @@ typedef enum	e_state
 	EXITED = 0b10000,
 	STOPPING = 0b100000,
 	STOPPED = 0b1000000,
-	DIED = 0b10000000
+	FATAL = 0b10000000
 }				t_state;
 
 typedef struct	s_job
@@ -124,6 +127,8 @@ typedef struct	s_job
 	char		*err;
 
 	int8_t		origin;
+	time_t		time_begin;
+	time_t		time_stop;
 }				t_job;
 
 extern struct s_master		*g_master;
