@@ -6,13 +6,12 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:10:31 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/01 18:55:52 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/03 18:27:40 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "taskmaster_daemon.h"
 #define SOCKET_FILE "/var/tmp/taskmasterd.socket"
-
 
 struct s_master		*g_master;
 t_ftvector			*g_jobs;
@@ -20,15 +19,16 @@ t_ftvector			*g_jobs;
 // TODO: Use port 4242 for tcp
 void	create_sockets(void)
 {
-	struct s_socket		*unix;
+	struct s_socket		*local;
 
-	unix = create_socket(AF_LOCAL, SOCKET_FILE, NULL);
+	local = create_socket(AF_LOCAL, SOCKET_FILE, NULL);
 	// TODO: consider limiting connections to 1 to avoid session-like shenanigans in this project
-	if (listen(unix->fd, 8) == -1)
-		dprintf(g_master->logfile, "Listening to %d failed\n", unix->fd);
+	//         NOPE
+	if (listen(local->fd, 8) == -1)
+		dprintf(g_master->logfile, "Listening to socket failed: %s\n", strerror(errno));
 	else
 		dprintf(g_master->logfile, "Started listening socket successfully\n");
-	g_master->sockets[0] = unix;
+	g_master->local = local;
 }
 
 pid_t	create_daemon(void)
@@ -62,6 +62,14 @@ pid_t	create_daemon(void)
 	return (pid);
 }
 
+void	destructor(void)
+{
+	close(g_master->logfile);
+	close(g_master->local->fd);
+//	close(g_master->inet->fd);
+	remove(SOCKET_FILE);
+}
+
 // TODO: use TASKMASTERD_CONFIG environment variable or argument for config file specification
 // TODO: make it possible to configure daemon to run in foreground (why?..)
 // TODO: show usage at standard error if no config file specified in any way
@@ -70,24 +78,22 @@ pid_t	create_daemon(void)
 
 int		main(int argc __attribute__((unused)), char **argv __attribute__((unused)))
 {
-	struct sockaddr_storage		client;
-	int							connection;
-	u_int32_t					client_size;
-//	char						buffer[1024];
-
-	remove(SOCKET_FILE);
 	g_master = calloc(1, sizeof(struct s_master));
 	g_master->logfile = open("/tmp/hello_world.socket.log", O_CREAT | O_APPEND | O_RDWR, 0644);
 	dprintf(g_master->logfile, "Initialising daemon...\n");
 	create_daemon();
 	dprintf(g_master->logfile, "Creating sockets...\n");
 	create_sockets();
+	tpool_init();
 
 	g_jobs = (t_ftvector *)malloc(sizeof(t_ftvector));
 	process_handling();
-	while ((connection = accept(g_master->sockets[0]->fd,
-		(struct sockaddr *)&client, &client_size)) == -1)
+	tpool_create_thread(NULL, accept_pthread_loop, &g_master->local->fd);
+//	tpool_create_thread(NULL, accept_pthread_loop, &g_master->inet->fd);
+	atexit(destructor);
+	while (ponies_teleported())
 	{
+		pause();
 		if (errno == EAGAIN)
 		{
 			dprintf(g_master->logfile, "EAGAIN connection\n%s\n", strerror(errno));
@@ -98,7 +104,5 @@ int		main(int argc __attribute__((unused)), char **argv __attribute__((unused)))
 		else
 			dprintf(g_master->logfile, "Connection acceptance failed\n%s\n", strerror(errno));
 	}
-//
-//	accept_receive_respond_loop();
 	return (0);
 }

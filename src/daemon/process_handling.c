@@ -127,7 +127,7 @@ void		sigchld_handler(int signo __attribute__((unused)))
 	// SET_FL - TODO
 	if (WIFEXITED(statloc) && WEXITSTATUS(statloc) == 228)
 		return ;
-	if (fcntl(g_master->sockets[0]->fd, F_SETFL, O_NONBLOCK) < 0)
+	if (fcntl(g_master->local->fd, F_SETFL, O_NONBLOCK) < 0)
 		// nah printf - bad func
 		dprintf(g_master->logfile, "NAH\n");
 	i = 0;
@@ -194,9 +194,9 @@ void		d_restart()
 	//TODO check return
 	// block sigchld signal
 	//sleep(10000);
-	val = fcntl(g_master->sockets[0]->fd, F_GETFL, 0);
+	val = fcntl(g_master->local->fd, F_GETFL, 0);
 	val &= ~O_NONBLOCK;
-	ret = fcntl(g_master->sockets[0]->fd, F_SETFL, val);
+	ret = fcntl(g_master->local->fd, F_SETFL, val);
 	while (i < g_jobs->len)
 	{
 		job = (t_job *)g_jobs->elem[i];

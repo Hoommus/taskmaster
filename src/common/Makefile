@@ -35,7 +35,8 @@ OBJ_DIR = ./obj/
 SRC = network_get.c \
       network_queue.c \
       network_send.c \
-      network_packets.c
+      network_packets.c \
+      ponies_teleported.c
 
 OBJ = $(addprefix $(OBJ_DIR), $(SRC:.c=.o))
 

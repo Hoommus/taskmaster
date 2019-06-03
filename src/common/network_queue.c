@@ -6,17 +6,19 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/27 18:40:07 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/31 16:21:25 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/03 17:12:45 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "taskmaster_cli.h"
 
+// TODO: see if this queue need any mutexes (it should)
 static struct s_packet	*g_queue_head;
 static struct s_packet	*g_queue_tail;
 
 // TODO: Limit packet list size
-
+// TODO: Consider removing this global queue totally
+// TODO:
 int				packet_enqueue(struct s_packet *packet)
 {
 	if (g_queue_head == NULL)

@@ -106,7 +106,7 @@ int			net_get(const int socket)
 	else if (status >= 0 && swap != NULL)
 	{
 		gettimeofday(&time, NULL);
-		packet_enqueue(packet_create(swap, time));
+		packet_enqueue(packet_create(socket, swap, time));
 	}
 	fcntl(socket, F_SETFL, flags & (~O_NONBLOCK));
 	return (status);

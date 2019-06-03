@@ -12,7 +12,7 @@
 
 #include "taskmaster_common.h"
 
-struct s_packet	*packet_create(const char *contents, struct timeval timestamp)
+struct s_packet	*packet_create(int socket, const char *contents, struct timeval timestamp)
 {
 	json_object			*obj;
 	struct s_packet		*packet;
@@ -20,6 +20,7 @@ struct s_packet	*packet_create(const char *contents, struct timeval timestamp)
 	packet = calloc(1, sizeof(struct s_packet));
 	if (packet == NULL)
 		return (NULL);
+	packet->respond_to = socket;
 	packet->timestamp = timestamp;
 	if ((obj = json_tokener_parse(contents)))
 	{

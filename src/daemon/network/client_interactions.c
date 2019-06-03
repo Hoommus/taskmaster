@@ -6,20 +6,18 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/29 18:37:19 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/01 20:43:40 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/03 18:24:18 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "taskmaster_daemon.h"
 
-static int			socket_fdddd;
-
-struct s_resolver	g_resolvers[] = {
+struct s_resolver			g_resolvers[] = {
 	{REQUEST_STATUS, &respond_status},
 	{0, NULL}
 };
 
-int					respond_status(const struct s_packet *packet)
+int							respond_status(const struct s_packet *packet)
 {
 	struct s_packet	*response;
 	json_object		*root;
@@ -32,64 +30,52 @@ int					respond_status(const struct s_packet *packet)
 	gettimeofday(&time, NULL);
 	response = packet_create_json(root, packet->request, time);
 	dprintf(g_master->logfile, "Reporting status to client\n");
-	net_send(socket_fdddd, response);
+	net_send(packet->respond_to, response);
+	// No need to free json object
 	return (packet == NULL);
 }
 
-static ssize_t		ponies_teleported(void)
+void __attribute__((noreturn))	*receive_respond(void *arg)
 {
-	ssize_t			ponies;
-	int				fd;
+	const struct s_thread_args	*args = (struct s_thread_args *)arg;
 
-	fd = open("/dev/urandom", O_RDONLY);
-	if (fd < 0)
-		return (1);
-	else
-	{
-		read(fd, &ponies, sizeof(ssize_t));
-		if (ponies == 0)
-			ponies += 1348;
-		close(fd);
-		return (ABS(ponies));
-	}
+	// TODO: get some info about the client
+	while (net_get(args->socket_fd))
+		packet_resolve_all();
+	dprintf(g_master->logfile, "Client dropped connection\n");
+	close(args->socket_fd);
+	tpool_finalize_thread(args->thread_id);
+	pthread_exit(NULL);
 }
 
-void				accept_receive_respond_loop(void)
+// TODO: add socket timeouts
+void __attribute__((noreturn))	*accept_pthread_loop(void *socket)
 {
+	const int					sock = *((int *)socket);
 	struct sockaddr_storage		client;
 	u_int32_t					client_size;
 	int							client_fd;
+	int							socket_flags;
 
 	bzero(&client, sizeof(struct sockaddr_storage));
 	client_size = sizeof(client);
-	client_fd = -1;
 	dup2(g_master->logfile, 2);
+	socket_flags = fcntl(sock, F_GETFL);
+	fcntl(sock, F_SETFL, socket_flags & ~(O_NONBLOCK));
 	while (ponies_teleported())
 	{
-		if (client_fd <= 0)
+		client_fd = accept(sock, (struct sockaddr *)&client, &client_size);
+		if (client_fd < 0 && errno != EINTR && errno != EAGAIN)
+			dprintf(g_master->logfile, "Connection acceptance failed: %s: %d\n", strerror(errno), sock);
+		else if (client_fd > 0)
 		{
-			// socket fd here should not have O_NONBLOCK
-			client_fd = accept(g_master->sockets[0]->fd,
-				(struct sockaddr *)&client, &client_size);
-			if (client_fd < 0 && errno != EINTR && errno != EAGAIN)
-				dprintf(g_master->logfile, "Connection acceptance failed\n");
-			else
-				dprintf(g_master->logfile, "Connected new client\n");
-			errno = 0;
-		}
-		if (client_fd != -1)
-		{
-			dprintf(g_master->logfile, "Waiting for requests\n");
-			if (net_get(client_fd) >= 0)
+			dprintf(g_master->logfile, "Connected new client %%add some information here%%\n");
+			if (tpool_create_thread(NULL, receive_respond, tpool_arg(client_fd)) < 0)
 			{
-				socket_fdddd = client_fd;
-				dprintf(g_master->logfile, "Got some requests\n");
-				packet_resolve_all();
-			}
-			else
-			{
-				dprintf(g_master->logfile, "net_get returned error: %s\n", strerror(errno));
+				dprintf(g_master->logfile, "Rejected new client: out of client threads\n");
+				close(sock); // reject connection
 			}
 		}
 	}
+	pthread_exit(NULL);
 }

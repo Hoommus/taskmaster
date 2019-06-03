@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:13:30 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/31 16:10:40 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/03 15:39:59 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include <signal.h>
 # include <stdbool.h>
 # include <sys/stat.h>
+# include <pthread.h>
 
 # include <errno.h>
 
@@ -41,13 +42,32 @@
 #  error You should not include taskmaster_cli.h with taskmaster_daemon.h
 # endif
 
+#ifndef THREAD_POOL_CAPACITY
+# define THREAD_POOL_CAPACITY 64
+#endif
+
+struct				s_thread_pool
+{
+	pthread_t		thread[THREAD_POOL_CAPACITY];
+	void			*args[THREAD_POOL_CAPACITY];
+	bool			is_busy[THREAD_POOL_CAPACITY];
+	int				threads_number;
+	int				pool_capacity;
+};
+
+struct				s_thread_args
+{
+	int			socket_fd;
+	int			thread_id;
+};
+
 typedef struct	s_socket
 {
 	int					socket_domain;
 	int					fd;
 	union
 	{
-		struct sockaddr_un	unix;
+		struct sockaddr_un	local;
 		struct sockaddr_in	inet;
 	}					addr;
 }				t_socket;
@@ -55,10 +75,9 @@ typedef struct	s_socket
 struct			s_master
 {
 	mode_t		tm_umask;
-	// First 4 sockets are unix, the rest are inet
-	t_socket	*sockets[8];
+	t_socket	*local;
+	t_socket	*inet;
 	int			logfile;
-
 };
 
 /*
@@ -126,9 +145,16 @@ typedef struct	s_job
 	int8_t		origin;
 }				t_job;
 
-extern struct s_master		*g_master;
 
-const t_socket	*register_socket(const t_socket *socket);
+struct			s_alteration
+{
+	pid_t				pid;
+	char				*name;
+	enum e_request		request;
+	struct s_alteration	*next;
+};
+
+extern struct s_master		*g_master;
 
 /*
 ** init
@@ -142,12 +168,19 @@ int				read_filename(const char *file, char **data);
 /*
 ** Network interactions
 */
-void			accept_receive_respond_loop(void);
+void __attribute__((noreturn))	*accept_pthread_loop(void *socket);
 
 int				respond_status(const struct s_packet *packet);
 
-
-
+/*
+** Network Thread Pool
+*/
+void				tpool_init(void);
+int					tpool_create_thread(const pthread_attr_t *attr,
+										void *(*runnable)(void *),
+										void *arg);
+void				tpool_finalize_thread(int id);
+void				*tpool_arg(int socket_fd);
 
 /*
 ** MY TERRITORY
