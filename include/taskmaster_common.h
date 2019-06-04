@@ -34,8 +34,12 @@
 # include "libft.h"
 
 # ifdef __linux__
+#  ifndef  __unused
+#   define __unused __attribute__((unused))
+#  endif
 #  undef unix
 # endif
+
 
 #define PACKET_DELIMITER 23
 

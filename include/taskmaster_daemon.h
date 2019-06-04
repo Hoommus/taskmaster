@@ -41,6 +41,10 @@
 # include "libft.h"
 # include "taskmaster_common.h"
 
+# ifdef __linux__
+#  include <wait.h>
+# endif
+
 # ifdef TASKMASTER_CLI_H
 #  error You should not include taskmaster_cli.h with taskmaster_daemon.h
 # endif

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/23 17:58:26 by obamzuro          #+#    #+#             */
-/*   Updated: 2019/06/03 19:27:19 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/04 12:53:54 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -230,6 +230,8 @@ void		d_restart()
 	t_job	*job;
 	int		val;
 	int		ret;
+	// TODO: these sigset_t differ on Linux, so you should use sigaddset() functions
+	//  to manipulate the mask. At the moment, this code won't compile on Linux
 	sigset_t	sigset;
 	sigset_t	osigset;
 
@@ -301,7 +303,7 @@ void		signal_attempting()
 	sigemptyset(&act.sa_mask);
 	act.sa_flags = 0;
 #ifdef SA_INTERRUPT
-	act.sa_flags |= SA_INTERRUPT
+	act.sa_flags |= SA_INTERRUPT;
 #endif
 	if (sigaction(SIGCHLD, &act, NULL) < 0)
 		exit(123);
