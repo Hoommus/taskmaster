@@ -30,6 +30,8 @@
 
 # include <fcntl.h>
 
+# include <pthread.h>
+
 # include "json.h"
 # include "libft.h"
 
