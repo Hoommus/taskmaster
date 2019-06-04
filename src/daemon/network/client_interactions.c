@@ -66,7 +66,10 @@ void __attribute__((noreturn))	*accept_pthread_loop(void *socket)
 	{
 		client_fd = accept(sock, (struct sockaddr *)&client, &client_size);
 		if (client_fd < 0 && errno != EINTR && errno != EAGAIN)
+		{
 			dprintf(g_master->logfile, "Connection acceptance failed: %s: %d\n", strerror(errno), sock);
+			usleep(5000000);
+		}
 		else if (client_fd > 0)
 		{
 			dprintf(g_master->logfile, "Connected new client %%add some information here%%\n");

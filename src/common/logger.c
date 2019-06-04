@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/04 13:03:25 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/04 14:08:49 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/04 15:23:19 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,8 @@ enum		e_log_level
 	LOG_WARN  = 4,
 	LOG_ERROR = 8,
 	LOG_FATAL = 16,
-	LOG_DEBUG = 32
+	LOG_DEBUG = 32,
+	LOG_SEVERE = 64
 };
 
 static const char * const	g_log_levels[] =
@@ -39,7 +40,8 @@ static const char * const	g_log_levels[] =
 	"WARN",
 	"ERROR",
 	"FATAL",
-	"DEBUG"
+	"DEBUG",
+	"SEVERE"
 };
 
 int			logger_init(const char *app_name)
@@ -65,6 +67,8 @@ int			logger_init(const char *app_name)
 	}
 	fseek(g_logger.logfile, 0L, SEEK_END);
 	pthread_mutex_init(&g_logfile_mutex, NULL);
+	bzero(buf, sizeof(buf));
+	strftime(buf, 1024, "%T %d.%m.%C -%z");
 	fprintf(g_logger.logfile, "%s logger initialized, ", app_name);
 	return (0);
 }

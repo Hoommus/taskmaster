@@ -120,6 +120,12 @@ int				net_send(int socket, struct s_packet *packet);
 int				net_get(int socket);
 
 /*
+** Logger
+*/
+
+int				logger_init(const char *app_name);
+
+/*
 ** Pony API
 */
 ssize_t					ponies_teleported(void);

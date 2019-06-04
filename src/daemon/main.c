@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:10:31 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/04 15:33:25 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/04 17:25:04 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,18 +17,16 @@ struct s_master		*g_master;
 t_ftvector			*g_jobs;
 
 // TODO: Use port 4242 for tcp
-void	create_sockets(void)
+int		create_sockets(void)
 {
-	struct s_socket		*local;
+	int			status;
 
-	local = create_socket(AF_LOCAL, SOCKET_FILE, NULL);
-	// TODO: consider limiting connections to 1 to avoid session-like shenanigans in this project
-	//         NOPE
-	if (listen(local->fd, 8) == -1)
-		dprintf(g_master->logfile, "Listening to socket failed: %s\n", strerror(errno));
-	else
-		dprintf(g_master->logfile, "Started listening socket successfully\n");
-	g_master->local = local;
+	status = 0;
+	if (socket_create_local(SOCKET_FILE))
+		status -= 1;
+	if (socket_create_inet("123.456.789.123:4242"))
+		status -= 1;
+	return (status);
 }
 
 pid_t	create_daemon(void)
@@ -81,13 +79,17 @@ int		main(int argc __attribute__((unused)), char **argv __attribute__((unused)))
 	sigset_t	sigset;
 	sigset_t	osigset;
 
+	logger_init();
 	g_master = calloc(1, sizeof(struct s_master));
 	g_master->logfile = open("/tmp/hello_world.socket.log", O_CREAT | O_APPEND | O_RDWR, 0644);
 	dprintf(g_master->logfile, "Initialising daemon...\n");
 	create_daemon();
-	dprintf(g_master->logfile, "Creating sockets...\n");
-	create_sockets();
 	tpool_init();
+	dprintf(g_master->logfile, "Creating sockets...\n");
+	if (create_sockets() == -1)
+		dprintf(g_master->logfile, "Failed to create some sockets\n");
+	else
+		tpool_create_thread(NULL, accept_pthread_loop, &g_master->local->fd);
 
 	g_jobs = (t_ftvector *)malloc(sizeof(t_ftvector));
 
@@ -97,7 +99,6 @@ int		main(int argc __attribute__((unused)), char **argv __attribute__((unused)))
 	process_handling();
 //	sigprocmask(SIG_SETMASK, &osigset, NULL);
 
-//	tpool_create_thread(NULL, accept_pthread_loop, &g_master->local->fd);
 //	tpool_create_thread(NULL, accept_pthread_loop, &g_master->inet->fd);
 	atexit(destructor);
 	while (ponies_teleported())
