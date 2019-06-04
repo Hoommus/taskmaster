@@ -3,10 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   process_handling.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: obamzuro <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/23 17:58:26 by obamzuro          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2019/06/03 19:40:55 by obamzuro         ###   ########.fr       */
+=======
+/*   Updated: 2019/06/04 12:53:54 by vtarasiu         ###   ########.fr       */
+>>>>>>> ac3fa04c000ec513857d5b43e4c2bf9e97190548
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +120,8 @@ int			handle_redirections(t_job *job)
 }
 
 void		sigchld_handler(int signo __attribute__((unused)),
-		siginfo_t *info, void *context __attribute__((unused)))
+		siginfo_t *info __attribute__((unused)),
+		void *context __attribute__((unused)))
 {
 	pid_t	pid;
 	int		statloc;
@@ -164,7 +169,7 @@ void		sigchld_handler(int signo __attribute__((unused)),
 		}
 		++i;
 	}
-	if (fcntl(g_master->sockets[0]->fd, F_SETFL, O_NONBLOCK) < 0)
+	if (fcntl(g_master->local->fd, F_SETFL, O_NONBLOCK) < 0)
 		// nah printf - bad func
 		dprintf(g_master->logfile, "NAH\n");
 }
@@ -229,6 +234,8 @@ void		d_restart()
 	t_job	*job;
 	int		val;
 	int		ret;
+	// TODO: these sigset_t differ on Linux, so you should use sigaddset() functions
+	//  to manipulate the mask. At the moment, this code won't compile on Linux
 	sigset_t	sigset;
 	sigset_t	osigset;
 
@@ -237,9 +244,9 @@ void		d_restart()
 	sigset |= SIGCHLD;
 	sigprocmask(SIG_BLOCK, &sigset, &osigset);
 	//TODO check return
-	val = fcntl(g_master->sockets[0]->fd, F_GETFL, 0);
+	val = fcntl(g_master->local->fd, F_GETFL, 0);
 	val &= ~O_NONBLOCK;
-	ret = fcntl(g_master->sockets[0]->fd, F_SETFL, val);
+	ret = fcntl(g_master->local->fd, F_SETFL, val);
 	while (i < g_jobs->len)
 	{
 		job = (t_job *)g_jobs->elem[i];
@@ -260,7 +267,7 @@ void		d_restart()
 	sigprocmask(SIG_SETMASK, &osigset, NULL);
 }
 
-void		alrm_handler(int signo)
+void		alrm_handler(int signo __attribute__((unused)))
 {
 	int		i;
 	t_job	*job;
@@ -300,7 +307,7 @@ void		signal_attempting()
 	sigemptyset(&act.sa_mask);
 	act.sa_flags = 0;
 #ifdef SA_INTERRUPT
-	act.sa_flags |= SA_INTERRUPT
+	act.sa_flags |= SA_INTERRUPT;
 #endif
 	if (sigaction(SIGCHLD, &act, NULL) < 0)
 		exit(123);

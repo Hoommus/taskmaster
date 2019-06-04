@@ -6,17 +6,12 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/21 13:47:28 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/23 18:29:20 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/03 15:39:59 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <assert.h>
 #include "taskmaster_daemon.h"
-
-void				send_heartbeat(t_socket *socket)
-{
-	write(socket->fd, "\0\0\0\0", 4);
-}
 
 /*
 ** Creates socket and binds it to desired address
@@ -31,8 +26,8 @@ struct s_socket		*create_socket(int domain, const char *filename, __unused const
 	sock->socket_domain = domain;
 	if (domain == AF_LOCAL)
 	{
-		sock->addr.unix.sun_family = domain;
-		strncpy(sock->addr.unix.sun_path, filename, sizeof(sock->addr.unix.sun_path) - 1);
+		sock->addr.local.sun_family = domain;
+		strncpy(sock->addr.local.sun_path, filename, sizeof(sock->addr.local.sun_path) - 1);
 	}
 	else if (domain == AF_INET)
 	{
@@ -42,12 +37,12 @@ struct s_socket		*create_socket(int domain, const char *filename, __unused const
 	}
 	sock->fd = socket(domain, SOCK_STREAM, 0);
 	if (domain == AF_LOCAL)
-		if (bind(sock->fd, (struct sockaddr *)&sock->addr.unix,
+		if (bind(sock->fd, (struct sockaddr *)&sock->addr.local,
 			sizeof(struct sockaddr_un)) == -1)
 			dprintf(g_master->logfile, "Binding socket to %s failed:\n%s\n",
-				sock->addr.unix.sun_path, strerror(errno));
+				sock->addr.local.sun_path, strerror(errno));
 	if (sock->fd == -1)
-		dprintf(g_master->logfile, "Socket creation failed for %s\n", filename);
+		dprintf(g_master->logfile, "Socket creation failed for %s: %s\n", filename, strerror(errno));
 	return (sock);
 }
 

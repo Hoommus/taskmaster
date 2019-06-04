@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/24 12:34:01 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/31 18:33:11 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/03 11:46:12 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,6 @@ struct s_packet		*pack_to_packet(enum e_request type, const char **args)
 	return (packet_create_json(object, type, time));
 }
 
-//void		print_job(json_object *job)
-//{
-//	job = NULL;
-//	// TODO
-//}
-
 int			parse_response_status(const struct s_packet *packet)
 {
 	json_object			*value;
@@ -44,7 +38,6 @@ int			parse_response_status(const struct s_packet *packet)
 	int					i;
 	int					len;
 
-	printf("Now parsing response\n");
 	status = -1;
 	if (json_object_object_get_ex(packet->json_content, "status", &value))
 		status = json_object_get_int(value);

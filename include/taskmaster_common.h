@@ -6,35 +6,46 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/24 12:40:25 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/31 16:16:29 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/03 16:58:40 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef TASKMASTER_COMMON_H
 # define TASKMASTER_COMMON_H
 
-# include "json.h"
+# include <stdio.h>
+
 # include <stdbool.h>
 # include <string.h>
 # include <time.h>
+
 # include <sys/time.h>
 # include <sys/socket.h>
+
 # include <sys/un.h>
 # include <netdb.h>
 # include <netinet/in.h>
+
 # include <errno.h>
 
+# include <fcntl.h>
+
+# include "json.h"
 # include "libft.h"
 
 # ifdef __linux__
+#  ifndef  __unused
+#   define __unused __attribute__((unused))
+#  endif
 #  undef unix
 # endif
+
 
 #define PACKET_DELIMITER 23
 
 # define RESPONSE_TIMEOUT_USECONDS
 
-enum				e_request
+enum					e_request
 {
 	REQUEST_HEARTBEAT    = 0,
 	REQUEST_STATUS       = 1,
@@ -51,8 +62,9 @@ enum				e_request
 ** Common network interactions
 */
 
-struct				s_packet
+struct					s_packet
 {
+	int				respond_to;
 	bool			is_content_parsed;
 	char			*content;
 	json_object		*json_content;
@@ -61,15 +73,15 @@ struct				s_packet
 	struct s_packet	*next;
 };
 
-typedef int			(*t_resolver_fun)(const struct s_packet *packet);
+typedef int				(*t_resolver_fun)(const struct s_packet *packet);
 
-struct				s_resolver
+struct					s_resolver
 {
 	enum e_request command;
 	t_resolver_fun resolver;
 };
 
-enum				e_remote
+enum					e_remote
 {
 	REMOTE_UNIX,
 	REMOTE_INET,
@@ -93,7 +105,7 @@ typedef struct			s_remote_alt
 
 extern struct s_resolver	g_resolvers[];
 
-struct s_packet	*packet_create(const char *contents, struct timeval timestamp);
+struct s_packet	*packet_create(int socket, const char *contents, struct timeval timestamp);
 struct s_packet	*packet_create_json(json_object *root, enum e_request request, struct timeval timestamp);
 int				packet_enqueue(struct s_packet *packet);
 int				packet_dequeue(struct s_packet *packet);
@@ -104,5 +116,10 @@ int				packet_resolve_first(enum e_request type);
 
 int				net_send(int socket, struct s_packet *packet);
 int				net_get(int socket);
+
+/*
+** Pony API
+*/
+ssize_t					ponies_teleported(void);
 
 #endif

@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/05/20 12:51:40 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/05/31 17:08:27 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/06/03 18:14:54 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -52,7 +52,7 @@ CONFIG_DIR = config/
 CONFIG_SRC = config_load.c
 
 NETWORK_DIR = network/
-NETWORK_SRC = sockets_manipulations.c client_interactions.c
+NETWORK_SRC = sockets_manipulations.c client_interactions.c thread_pool.c
 
 OBJ = $(addprefix $(OBJ_DIR), $(DAEMON_SRC:.c=.o))                        \
       $(addprefix $(OBJ_DIR)$(CONFIG_DIR), $(CONFIG_SRC:.c=.o))           \
