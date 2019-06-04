@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:10:31 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/04 14:50:04 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/04 15:33:25 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,9 @@ void	destructor(void)
 
 int		main(int argc __attribute__((unused)), char **argv __attribute__((unused)))
 {
+	sigset_t	sigset;
+	sigset_t	osigset;
+
 	g_master = calloc(1, sizeof(struct s_master));
 	g_master->logfile = open("/tmp/hello_world.socket.log", O_CREAT | O_APPEND | O_RDWR, 0644);
 	dprintf(g_master->logfile, "Initialising daemon...\n");
@@ -87,22 +90,30 @@ int		main(int argc __attribute__((unused)), char **argv __attribute__((unused)))
 	tpool_init();
 
 	g_jobs = (t_ftvector *)malloc(sizeof(t_ftvector));
+
+	sigemptyset(&sigset);
+	sigset |= SIGCHLD;
+	sigprocmask(SIG_BLOCK, &sigset, &osigset);
 	process_handling();
-	tpool_create_thread(NULL, accept_pthread_loop, &g_master->local->fd);
+//	sigprocmask(SIG_SETMASK, &osigset, NULL);
+
+//	tpool_create_thread(NULL, accept_pthread_loop, &g_master->local->fd);
 //	tpool_create_thread(NULL, accept_pthread_loop, &g_master->inet->fd);
 	atexit(destructor);
 	while (ponies_teleported())
 	{
-		pause();
-		if (errno == EAGAIN)
-		{
-			dprintf(g_master->logfile, "EAGAIN connection\n%s\n", strerror(errno));
-			d_restart();
-		}
-		else if (errno == EINTR)
-			dprintf(g_master->logfile, "EINTR connection\n%s\n", strerror(errno));
-		else
-			dprintf(g_master->logfile, "Connection acceptance failed\n%s\n", strerror(errno));
+		if (sigsuspend(&osigset) != -1)
+			dprintf(g_master->logfile, "SIGSUSPEND error\n");
+		d_restart();
+//		pause();
+//		if (errno == EAGAIN)
+//		{
+//			dprintf(g_master->logfile, "EAGAIN connection\n%s\n", strerror(errno));
+//		}
+//		else if (errno == EINTR)
+//			dprintf(g_master->logfile, "EINTR connection\n%s\n", strerror(errno));
+//		else
+//			dprintf(g_master->logfile, "Connection acceptance failed\n%s\n", strerror(errno));
 	}
 	return (0);
 }

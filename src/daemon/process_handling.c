@@ -6,11 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/23 17:58:26 by obamzuro          #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2019/06/03 19:40:55 by obamzuro         ###   ########.fr       */
-=======
-/*   Updated: 2019/06/04 12:53:54 by vtarasiu         ###   ########.fr       */
->>>>>>> ac3fa04c000ec513857d5b43e4c2bf9e97190548
+/*   Updated: 2019/06/04 15:36:40 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +14,7 @@
 
 char		*argsHardcoded[] =
 {
-	"/bin/bash", "/Users/obamzuro/tm-Vlad/src/daemon/echoer.sh", NULL
+	"/bin/bash", "src/daemon/echoer.sh", NULL
 };
 
 int8_t		expected_statuses[] =
@@ -232,21 +228,17 @@ void		d_restart()
 {
 	int		i;
 	t_job	*job;
-	int		val;
-	int		ret;
 	// TODO: these sigset_t differ on Linux, so you should use sigaddset() functions
 	//  to manipulate the mask. At the moment, this code won't compile on Linux
-	sigset_t	sigset;
-	sigset_t	osigset;
 
 	i = 0;
-	sigemptyset(&sigset);
-	sigset |= SIGCHLD;
-	sigprocmask(SIG_BLOCK, &sigset, &osigset);
+//	sigemptyset(&sigset);
+//	sigset |= SIGCHLD;
+//	sigprocmask(SIG_BLOCK, &sigset, &osigset);
 	//TODO check return
-	val = fcntl(g_master->local->fd, F_GETFL, 0);
-	val &= ~O_NONBLOCK;
-	ret = fcntl(g_master->local->fd, F_SETFL, val);
+//	val = fcntl(g_master->local->fd, F_GETFL, 0);
+//	val &= ~O_NONBLOCK;
+//	ret = fcntl(g_master->local->fd, F_SETFL, val);
 	while (i < g_jobs->len)
 	{
 		job = (t_job *)g_jobs->elem[i];
@@ -264,7 +256,7 @@ void		d_restart()
 		}
 		++i;
 	}
-	sigprocmask(SIG_SETMASK, &osigset, NULL);
+//	sigprocmask(SIG_SETMASK, &osigset, NULL);
 }
 
 void		alrm_handler(int signo __attribute__((unused)))
@@ -327,17 +319,11 @@ void		signal_attempting()
 void		process_handling()
 {
 	int			i;
-	sigset_t	sigset;
-	sigset_t	osigset;
 
 	jobs_filler();
 	signal_attempting();
-	sigemptyset(&sigset);
-	sigset |= SIGCHLD;
-	sigprocmask(SIG_BLOCK, &sigset, &osigset);
 	i = -1;
 	while (++i < g_jobs->len)
 		d_start(i);
-	sigprocmask(SIG_SETMASK, &osigset, NULL);
 	dprintf(g_master->logfile, "process handled\n");
 }
