@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/24 12:40:25 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/03 16:58:40 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/05 17:11:32 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,23 @@ int				net_get(int socket);
 ** Logger
 */
 
-int				logger_init(const char *app_name);
+enum				e_log_level
+{
+	LOG_OFF = 0,
+	LOG_FATAL = 1,
+	LOG_SEVERE = 2,
+	LOG_ERROR = 4,
+	LOG_WARN = 8,
+	LOG_INFO = 16,
+	LOG_DEBUG = 128,
+};
+
+int					logger_init(enum e_log_level level, const char *app_name);
+enum e_log_level	logger_level_parse(const char *str);
+FILE				*logger_get_file(void);
+int					log_write(enum e_log_level level, const char *message);
+int __attribute__((__format__ (__printf__, 2, 3)))
+				log_fwrite(enum e_log_level level, const char *format, ...);
 
 /*
 ** Pony API

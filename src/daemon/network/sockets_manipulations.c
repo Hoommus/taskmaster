@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/21 13:47:28 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/04 16:51:57 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/05 21:35:41 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,9 @@ struct s_socket		*socket_create_inet(const char *address)
 	sock->socket_domain = AF_INET;
 	sock->addr.inet.sin_family = AF_INET;
 	if ((sock->fd = socket(AF_INET, SOCK_STREAM, 0)))
-		dprintf(g_master->logfile, "Failed to create a local socket: %s\n", strerror(errno));
+		log_fwrite(LOG_ERROR, "Failed to create a local socket: %s", strerror(errno));
 	else if (bind(sock->fd, (struct sockaddr *)&sock->addr.inet, sizeof(struct sockaddr_in)) == -1)
-		dprintf(g_master->logfile, "Failed to bind a socket to %s\n", address);
+		log_fwrite(LOG_ERROR, "Failed to bind a socket to %s", address);
 	destroy_socket(&sock);
 	return (sock);
 }
@@ -43,48 +43,21 @@ struct s_socket		*socket_create_local(const char *filename)
 	strncpy(sock->addr.local.sun_path, filename, sizeof(sock->addr.local.sun_path) - 1);
 	sock->socket_domain = AF_LOCAL;
 	sock->addr.local.sun_family = AF_LOCAL;
-	if ((sock->fd = socket(AF_LOCAL, SOCK_STREAM, 0)))
-		dprintf(g_master->logfile, "Failed to create a local socket: %s\n", strerror(errno));
-	else if (bind(sock->fd, (struct sockaddr *)&sock->addr.local, sizeof(struct sockaddr_un)) == -1)
-		dprintf(g_master->logfile, "Failed to bind a socket to %s\n", filename);
-	destroy_socket(&sock);
-	return (sock);
-}
-
-/*
-** Creates socket and binds it to desired address
-*/
-
-struct s_socket		*create_socket(int domain, const char *filename, __unused const char *address)
-{
-	struct s_socket		*sock;
-
-	assert(domain == AF_INET || domain == AF_LOCAL);
-	sock = calloc(1, sizeof(struct s_socket));
-	sock->socket_domain = domain;
-	if (domain == AF_LOCAL)
+	if ((sock->fd = socket(AF_LOCAL, SOCK_STREAM, 0)) == -1)
 	{
-		sock->addr.local.sun_family = domain;
-		strncpy(sock->addr.local.sun_path, filename, sizeof(sock->addr.local.sun_path) - 1);
-	}
-	else if (domain == AF_INET)
-	{
-		sock->addr.inet.sin_family = domain;
-		// TODO: look into what inet socket address needs and make this happen
-		// strncpy(sock->addr.inet.sin_addr.s_addr, filename, sizeof(sock->addr.inet.sin_addr) - 1);
-	}
-	sock->fd = socket(domain, SOCK_STREAM, 0);
-	if (domain == AF_LOCAL)
-		if (bind(sock->fd, (struct sockaddr *)&sock->addr.local,
-			sizeof(struct sockaddr_un)) == -1)
-			dprintf(g_master->logfile, "Binding socket to %s failed:\n%s\n",
-				sock->addr.local.sun_path, strerror(errno));
-	if (sock->fd == -1)
-	{
-		dprintf(g_master->logfile, "Socket creation failed for %s: %s\n", filename, strerror(errno));
+		log_fwrite(LOG_ERROR, "Failed to create a local socket: %s: %s", filename, strerror(errno));
 		destroy_socket(&sock);
-		return (NULL);
+	}
+	else if (bind(sock->fd, (struct sockaddr *)&sock->addr.local, sizeof(struct sockaddr_un)) == -1)
+	{
+		log_fwrite(LOG_ERROR, "Failed to bind a socket to %s: %s", filename, strerror(errno));
+		destroy_socket(&sock);
+	}
+	else
+	{
+		log_fwrite(LOG_DEBUG, "Successfully created socket at %s (fd: %d)", filename, sock->fd);
+		if (setsockopt(sock->fd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) == -1)
+			log_fwrite(LOG_ERROR, "Failed to set socket options: %s", strerror(errno));
 	}
 	return (sock);
 }
-
