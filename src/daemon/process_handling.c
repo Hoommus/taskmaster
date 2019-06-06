@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/23 17:58:26 by obamzuro          #+#    #+#             */
-/*   Updated: 2019/06/04 15:36:40 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/04 16:48:46 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,9 +115,7 @@ int			handle_redirections(t_job *job)
 	return (0);
 }
 
-void		sigchld_handler(int signo __attribute__((unused)),
-		siginfo_t *info __attribute__((unused)),
-		void *context __attribute__((unused)))
+void		sigchld_handler(int signo __attribute__((unused)))
 {
 	pid_t	pid;
 	int		statloc;
@@ -165,9 +163,9 @@ void		sigchld_handler(int signo __attribute__((unused)),
 		}
 		++i;
 	}
-	if (fcntl(g_master->local->fd, F_SETFL, O_NONBLOCK) < 0)
-		// nah printf - bad func
-		dprintf(g_master->logfile, "NAH\n");
+//	if (fcntl(g_master->local->fd, F_SETFL, O_NONBLOCK) < 0)
+//		// nah printf - bad func
+//		dprintf(g_master->logfile, "NAH\n");
 }
 
 void		d_stop(int iter)
@@ -292,28 +290,28 @@ void		alrm_handler(int signo __attribute__((unused)))
 
 void		signal_attempting()
 {
-	struct sigaction	act;
-
-	act.sa_handler = NULL;
-	act.sa_sigaction = sigchld_handler;
-	sigemptyset(&act.sa_mask);
-	act.sa_flags = 0;
-#ifdef SA_INTERRUPT
-	act.sa_flags |= SA_INTERRUPT;
-#endif
-	if (sigaction(SIGCHLD, &act, NULL) < 0)
-		exit(123);
-	act.sa_handler = alrm_handler;
+//	struct sigaction	act;
+//
 //	act.sa_handler = NULL;
-	act.sa_sigaction = NULL;
-	sigemptyset(&act.sa_mask);
-	// hz
-	sigaddset(&act.sa_mask, SIGCHLD);
-	act.sa_flags = 0;
-	act.sa_flags |= SA_NODEFER;// | SA_SIGINFO;
-	if (sigaction(SIGALRM, &act, NULL) < 0)
-		exit (123);
-	dprintf(g_master->logfile, "Signals handled\n");
+//	act.sa_sigaction = sigchld_handler;
+//	sigemptyset(&act.sa_mask);
+//	act.sa_flags = 0;
+//#ifdef SA_INTERRUPT
+//	act.sa_flags |= SA_INTERRUPT;
+//#endif
+//	if (sigaction(SIGCHLD, &act, NULL) < 0)
+//		exit(123);
+//	act.sa_handler = alrm_handler;
+////	act.sa_handler = NULL;
+//	act.sa_sigaction = NULL;
+//	sigemptyset(&act.sa_mask);
+//	// hz
+//	sigaddset(&act.sa_mask, SIGCHLD);
+//	act.sa_flags = 0;
+//	act.sa_flags |= SA_NODEFER;// | SA_SIGINFO;
+//	if (sigaction(SIGALRM, &act, NULL) < 0)
+//		exit (123);
+//	dprintf(g_master->logfile, "Signals handled\n");
 }
 
 void		process_handling()
@@ -321,7 +319,7 @@ void		process_handling()
 	int			i;
 
 	jobs_filler();
-	signal_attempting();
+//	signal_attempting();
 	i = -1;
 	while (++i < g_jobs->len)
 		d_start(i);

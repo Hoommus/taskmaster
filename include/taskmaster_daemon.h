@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:13:30 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/06 16:54:06 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/06 13:11:36 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,4 +217,5 @@ void			push_ftvector(t_ftvector *vec, void *line);
 void			d_restart();
 
 extern t_ftvector			*g_jobs;
+void			sigchld_handler(int signo);
 #endif
