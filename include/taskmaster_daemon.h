@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:13:30 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/06 18:01:47 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/06 21:38:44 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,11 +108,12 @@ typedef enum	e_policyType
 ** All of these are signed to allow special value of -1
 */
 
-//typedef struct	s_process
-//{
-//	pid_t		pid;
-//	int			state;
-//}				t_process;
+typedef struct	s_ftvector
+{
+	void			**elem;
+	int				capacity;
+	unsigned int	len;
+}				t_ftvector;
 
 typedef enum	e_state
 {
@@ -126,12 +127,22 @@ typedef enum	e_state
 	FATAL = 0b10000000
 }				t_state;
 
+typedef struct	s_process
+{
+	pid_t		pid;
+	t_state		state;
+	int16_t		restart_attempts;
+	time_t		time_begin;
+	time_t		time_stop;
+}				t_process;
+
 typedef struct	s_job
 {
 //	int			jid;
-	pid_t		pid;
-	t_state		state;
-//	t_process	*processes;
+//	pid_t		pid;
+	t_process		*processes;
+	unsigned int	processes_length;
+
 	char		**args;
 	int64_t		policy;
 	int64_t		program_duplicates;
@@ -150,10 +161,7 @@ typedef struct	s_job
 	char		*err;
 
 	int8_t		origin;
-	time_t		time_begin;
-	time_t		time_stop;
 }				t_job;
-
 
 struct			s_alteration
 {
@@ -198,12 +206,6 @@ void				*tpool_arg(int socket_fd);
 
 void		process_handling();
 
-typedef struct	s_ftvector
-{
-	void	**elem;
-	int		capacity;
-	int		len;
-}				t_ftvector;
 int				process_config(t_ftvector jobs);
 void			init_ftvector(t_ftvector *vec);
 void			free_ftvector(t_ftvector *vec);
@@ -212,5 +214,5 @@ void			push_ftvector(t_ftvector *vec, void *line);
 void			d_restart();
 
 extern t_ftvector			*g_jobs;
-void			sigchld_handler(int signo);
+void			sigchld_handler(void);
 #endif

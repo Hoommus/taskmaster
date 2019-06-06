@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:10:31 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/06 18:44:32 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/06 21:37:27 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,26 +186,15 @@ int					main(int argc, char **argv)
 	atexit(destructor);
 	while (ponies_teleported())
 	{
-//		if (sigsuspend(&osigset) != -1)
-//			log_write(LOG_ERROR, "SIGSUSPEND error\n");
 		if ((err = sigwait(&sigset, &signo)))
-			log_write(LOG_ERROR, "SIGWAIT error\n");
+			log_write(LOG_ERROR, "SIGWAIT error");
 		if (signo == SIGCHLD)
 		{
-			log_write(LOG_DEBUG, "SIGCHLD yep\n");
-			sigchld_handler(signo);
+			log_write(LOG_DEBUG, "SIGCHLD yep");
+			sigchld_handler();
 			d_restart();
 		}
-		log_write(LOG_DEBUG, "SIG yep\n");
-//		pause();
-//		if (errno == EAGAIN)
-//		{
-//			log_write(LOG_ERROR, "EAGAIN connection\n%s\n", strerror(errno));
-//		}
-//		else if (errno == EINTR)
-//			log_write(LOG_ERROR, "EINTR connection\n%s\n", strerror(errno));
-//		else
-//			log_write(LOG_ERROR, "Connection acceptance failed\n%s\n", strerror(errno));
+		log_write(LOG_DEBUG, "SIG yep");
 	}
 	return (0);
 }
