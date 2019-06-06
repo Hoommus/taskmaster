@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:10:31 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/04 15:33:25 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/04 16:48:49 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,8 @@ int		main(int argc __attribute__((unused)), char **argv __attribute__((unused)))
 {
 	sigset_t	sigset;
 	sigset_t	osigset;
+	int			err;
+	int			signo;
 
 	g_master = calloc(1, sizeof(struct s_master));
 	g_master->logfile = open("/tmp/hello_world.socket.log", O_CREAT | O_APPEND | O_RDWR, 0644);
@@ -92,28 +94,27 @@ int		main(int argc __attribute__((unused)), char **argv __attribute__((unused)))
 	g_jobs = (t_ftvector *)malloc(sizeof(t_ftvector));
 
 	sigemptyset(&sigset);
-	sigset |= SIGCHLD;
-	sigprocmask(SIG_BLOCK, &sigset, &osigset);
+	sigaddset(&sigset, SIGCHLD);
+	if ((err = pthread_sigmask(SIG_BLOCK, &sigset, &osigset)))
+		dprintf(g_master->logfile, "Pthread_sigmask error\n%s\n", strerror(err));
+
 	process_handling();
-//	sigprocmask(SIG_SETMASK, &osigset, NULL);
 
 //	tpool_create_thread(NULL, accept_pthread_loop, &g_master->local->fd);
 //	tpool_create_thread(NULL, accept_pthread_loop, &g_master->inet->fd);
 	atexit(destructor);
 	while (ponies_teleported())
 	{
-		if (sigsuspend(&osigset) != -1)
-			dprintf(g_master->logfile, "SIGSUSPEND error\n");
-		d_restart();
-//		pause();
-//		if (errno == EAGAIN)
-//		{
-//			dprintf(g_master->logfile, "EAGAIN connection\n%s\n", strerror(errno));
-//		}
-//		else if (errno == EINTR)
-//			dprintf(g_master->logfile, "EINTR connection\n%s\n", strerror(errno));
-//		else
-//			dprintf(g_master->logfile, "Connection acceptance failed\n%s\n", strerror(errno));
+		if ((err = sigwait(&sigset, &signo)))
+			// TODO exit or smth smart
+			dprintf(g_master->logfile, "Sigwait error\n%s\n", strerror(err));
+		else if (signo == SIGCHLD)
+		{
+			dprintf(g_master->logfile, "SIGCHLD signal!\n");
+			sigchld_handler(signo);
+			d_restart();
+		}
+		dprintf(g_master->logfile, "signal %d!\n", signo);
 	}
 	return (0);
 }
