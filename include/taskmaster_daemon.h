@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:13:30 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/04 16:29:14 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/06 13:11:36 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,7 +169,8 @@ extern struct s_master		*g_master;
 ** init
 */
 
-t_socket		*create_socket(int domain, const char *filename, const char *address);
+struct s_socket		*socket_create_local(const char *filename);
+struct s_socket		*socket_create_inet(const char *address);
 
 int				read_fd(const int fd, char **result);
 int				read_filename(const char *file, char **data);

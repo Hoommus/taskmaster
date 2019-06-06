@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 19:36:29 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/24 12:34:35 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/05 20:00:03 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,22 +17,22 @@
 // TODO: use sysctl() to retrieve information about running taskmasterd processes
 int			connect_socket_unix(void)
 {
-	struct sockaddr_un	*unix;
+	struct sockaddr_un	*local;
 	struct s_remote		*daemon;
 	int					connection;
 
 	daemon = calloc(1, sizeof(t_remote));
-	unix = &daemon->addr.unix;
-	memset(unix, 0, sizeof(struct sockaddr_un));
-	unix->sun_family = AF_LOCAL;
-	strncpy(unix->sun_path, SOCKET_FILE, sizeof(unix->sun_path) - 1);
+	local = &daemon->addr.unix;
+	memset(local, 0, sizeof(struct sockaddr_un));
+	local->sun_family = AF_LOCAL;
+	strncpy(local->sun_path, SOCKET_FILE, sizeof(local->sun_path) - 1);
 	if ((daemon->socket_fd = socket(AF_LOCAL, SOCK_STREAM, 0)) == -1)
 		dprintf(2, "%s\nsocket @%s\n", strerror(errno), SOCKET_FILE);
 	daemon->domain = AF_LOCAL;
-	connection = connect(daemon->socket_fd, (struct sockaddr *)unix, sizeof(unix->sun_path));
+	connection = connect(daemon->socket_fd, (struct sockaddr *)local, sizeof(local->sun_path));
 	if (connection == -1)
 	{
-		dprintf(2, "%s\nsocket @%s\n", strerror(errno), SOCKET_FILE);
+		dprintf(2, "%s: socket @%s\n", strerror(errno), SOCKET_FILE);
 		free(daemon);
 	}
 	else
@@ -82,6 +82,7 @@ int			tm_disconnect(const char **args)
 			close(g_shell->daemon->connection_fd);
 		if (g_shell->daemon->socket_fd > 2)
 			close(g_shell->daemon->socket_fd);
+		bzero(g_shell->daemon, sizeof(struct s_remote));
 		free(g_shell->daemon);
 		g_shell->daemon = NULL;
 	}

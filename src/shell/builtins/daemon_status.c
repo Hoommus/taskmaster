@@ -68,6 +68,8 @@ int			tm_status(const char **args)
 	response = NULL;
 	if (args && args[0] && strcmp(args[0], "--help") == 0)
 		printf("Usage goes here\n");
+	else if (g_shell->daemon == NULL)
+		dprintf(2, "You need to connect to some daemon first\n");
 	else
 	{
 		request = pack_to_packet(REQUEST_STATUS, args);

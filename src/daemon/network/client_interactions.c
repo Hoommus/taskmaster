@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/29 18:37:19 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/03 18:24:18 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/05 21:48:03 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int							respond_status(const struct s_packet *packet)
 	json_object_object_add(root, "jobs", (array));
 	gettimeofday(&time, NULL);
 	response = packet_create_json(root, packet->request, time);
-	dprintf(g_master->logfile, "Reporting status to client\n");
+	log_write(LOG_INFO, "Reporting status to client");
 	net_send(packet->respond_to, response);
 	// No need to free json object
 	return (packet == NULL);
@@ -42,7 +42,7 @@ void __attribute__((noreturn))	*receive_respond(void *arg)
 	// TODO: get some info about the client
 	while (net_get(args->socket_fd))
 		packet_resolve_all();
-	dprintf(g_master->logfile, "Client dropped connection\n");
+	log_write(LOG_INFO, "Client dropped connection");
 	close(args->socket_fd);
 	tpool_finalize_thread(args->thread_id);
 	pthread_exit(NULL);
@@ -57,22 +57,26 @@ void __attribute__((noreturn))	*accept_pthread_loop(void *socket)
 	int							client_fd;
 	int							socket_flags;
 
+	log_fwrite(LOG_DEBUG, "Started thread for %d socket", sock);
 	bzero(&client, sizeof(struct sockaddr_storage));
 	client_size = sizeof(client);
-	dup2(g_master->logfile, 2);
 	socket_flags = fcntl(sock, F_GETFL);
 	fcntl(sock, F_SETFL, socket_flags & ~(O_NONBLOCK));
 	while (ponies_teleported())
 	{
 		client_fd = accept(sock, (struct sockaddr *)&client, &client_size);
 		if (client_fd < 0 && errno != EINTR && errno != EAGAIN)
-			dprintf(g_master->logfile, "Connection acceptance failed: %s: %d\n", strerror(errno), sock);
+		{
+			log_fwrite(LOG_WARN, "Connection acceptance failed: %s: %d", strerror(errno), sock);
+			usleep(5000000);
+		}
 		else if (client_fd > 0)
 		{
-			dprintf(g_master->logfile, "Connected new client %%add some information here%%\n");
+			log_fwrite(LOG_INFO, "Connected new %s client",
+				client.ss_family == AF_LOCAL ? "local" : "inet");
 			if (tpool_create_thread(NULL, receive_respond, tpool_arg(client_fd)) < 0)
 			{
-				dprintf(g_master->logfile, "Rejected new client: out of client threads\n");
+				log_write(LOG_INFO, "Rejected new client: out of client threads");
 				close(sock); // reject connection
 			}
 		}
