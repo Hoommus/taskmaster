@@ -1,15 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   init.c                                             :+:      :+:    :+:   */
+/*   serve_heartbeat.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/05/20 19:35:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/20 19:35:06 by vtarasiu         ###   ########.fr       */
+/*   Created: 2019/06/06 18:38:41 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/06/06 18:47:03 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "taskmaster_cli.h"
+#include "taskmaster_daemon.h"
 
-// TODO: Send heartbeats to sockets if needed
+int							respond_heartbeat(const struct s_packet *packet)
+{
+	return (packet == NULL);
+}

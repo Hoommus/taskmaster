@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:10:31 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/05 21:46:11 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/06 20:12:35 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,10 @@ int		create_sockets(void)
 	status = 0 - (g_master->local == 0);
 	if (status == 0)
 	{
-		listen(g_master->local->fd, 8);
-		log_write(LOG_INFO, "Successfully started listening to a local socket");
+		if (listen(g_master->local->fd, 8) == -1)
+			log_fwrite(TLOG_INFO, "Failed to listen to a local socket: %s", strerror(errno));
+		else
+			log_write(TLOG_INFO, "Successfully started listening to a local socket");
 	}
 //	if (!socket_create_inet("123.456.789.123:4242"))
 //		status -= 1;
@@ -38,7 +40,7 @@ int		create_sockets(void)
 
 pid_t	create_daemon(void)
 {
-	struct rlimit	limits;
+//	struct rlimit	limits;
 	const sigset_t	mask = {0};
 	pid_t			pid;
 	int32_t			null;
@@ -46,31 +48,31 @@ pid_t	create_daemon(void)
 
 	if (fork() > 0)
 		exit(EXIT_SUCCESS);
-	log_write(LOG_DEBUG, "Successfully forked first time");
+	log_write(TLOG_DEBUG, "Successfully forked first time");
 	i = 2;
-	if (getrlimit(RLIMIT_NOFILE, &limits) == 0)
-		while (++i < limits.rlim_cur)
-			if ((int)i != fileno(logger_get_file()))
-				close(i);
-	log_write(LOG_DEBUG, "Closed all redundant fds");
+//	if (getrlimit(RLIMIT_NOFILE, &limits) == 0)
+//		while (++i < limits.rlim_cur)
+//			if ((int)i != fileno(logger_get_file()))
+//				close(i);
+	log_write(TLOG_DEBUG, "Closed all redundant fds");
 	sigprocmask(SIG_SETMASK, &mask, NULL);
 	setsid();
 	umask(0);
-	log_write(LOG_DEBUG, "Set sigprocmask, sid and umask(0)");
+	log_write(TLOG_DEBUG, "Set sigprocmask, sid and umask(0)");
 	if ((pid = fork()) > 0)
 		exit(EXIT_SUCCESS);
 	else if (pid == -1)
 	{
-		log_write(LOG_FATAL, "Failed to fork second time");
+		log_write(TLOG_FATAL, "Failed to fork second time");
 		exit(2);
 	}
-	log_write(LOG_DEBUG, "Successfully forked second time, now we're real daemon");
+	log_write(TLOG_DEBUG, "Successfully forked second time, now we're real daemon");
 	null = open("/dev/null", O_RDWR);
 	dup2(0, null);
 	dup2(1, null);
 	dup2(2, null);
 	close(null);
-	log_write(LOG_DEBUG, "Replaced all standard fds with /dev/null");
+	log_write(TLOG_DEBUG, "Replaced all standard fds with /dev/null");
 	return (pid);
 }
 
@@ -127,7 +129,7 @@ struct s_args		parse_args(int argc, char **argv)
 	static struct s_args			args;
 
 	args.config_file = CONFIG_DEFAULT;
-	args.log_level = LOG_DEBUG; // TODO: change this to LOG_WARN
+	args.log_level = TLOG_DEBUG; // TODO: change this to TLOG_WARN
 	while ((opt = getopt_long(argc, argv, "c:h:", longopts, NULL)) != -1)
 	{
 		if (opt == 1)
@@ -162,12 +164,12 @@ int					main(int argc, char **argv)
 		dprintf(2, "loglevel has unknown level, setting to INFO\n");
 	logger_init(args.log_level, argv[0]);
 	g_master = calloc(1, sizeof(struct s_master));
-	log_write(LOG_DEBUG, "Initialising daemon");
+	log_write(TLOG_DEBUG, "Initialising daemon");
 	create_daemon();
 	tpool_init();
-	log_write(LOG_DEBUG, "Creating sockets");
+	log_write(TLOG_DEBUG, "Creating sockets");
 	if (create_sockets() == -1)
-		log_write(LOG_ERROR, "Failed to create some sockets");
+		log_write(TLOG_ERROR, "Failed to create some sockets");
 	else
 		tpool_create_thread(NULL, accept_pthread_loop, tpool_arg(g_master->local->fd));
 
@@ -182,17 +184,17 @@ int					main(int argc, char **argv)
 	while (ponies_teleported())
 	{
 		if (sigsuspend(&osigset) != -1)
-			log_write(LOG_ERROR, "SIGSUSPEND error\n");
+			log_write(TLOG_ERROR, "SIGSUSPEND error\n");
 		d_restart();
 //		pause();
 //		if (errno == EAGAIN)
 //		{
-//			log_write(LOG_ERROR, "EAGAIN connection\n%s\n", strerror(errno));
+//			log_write(TLOG_ERROR, "EAGAIN connection\n%s\n", strerror(errno));
 //		}
 //		else if (errno == EINTR)
-//			log_write(LOG_ERROR, "EINTR connection\n%s\n", strerror(errno));
+//			log_write(TLOG_ERROR, "EINTR connection\n%s\n", strerror(errno));
 //		else
-//			log_write(LOG_ERROR, "Connection acceptance failed\n%s\n", strerror(errno));
+//			log_write(TLOG_ERROR, "Connection acceptance failed\n%s\n", strerror(errno));
 	}
 	return (0);
 }

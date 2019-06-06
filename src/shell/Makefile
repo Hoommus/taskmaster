@@ -72,7 +72,8 @@ BUILTIN_DIR = builtins/
 BUILTIN_SRC = builtins.c \
               hs_history.c \
               tokenizer_test.c \
-              network_connect.c daemon_status.c
+              network_connect.c daemon_status.c \
+              daemon_stop.c
 
 INTERFACE_DIR = line_editing/
 INTERFACE_SRC = buffer_drawing.c buffer_input.c  \

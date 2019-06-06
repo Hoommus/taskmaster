@@ -39,5 +39,6 @@ int						hs_history(const char **args);
 int						hs_tokenizer(const char **args);
 
 int						tm_status(const char **args);
+int						tm_stop(const char **args);
 
 #endif

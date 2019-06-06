@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/31 13:19:08 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/31 16:16:29 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/06 20:15:55 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,12 @@ struct s_packet	*packet_create(int socket, const char *contents, struct timeval 
 	}
 	else
 	{
-		packet->content = strdup(contents);
+		packet->content = NULL;
+		packet->json_content = NULL;
 		packet->request = 2147483647;
 	}
 	return (packet);
 }
-
 
 struct s_packet	*packet_create_json(json_object *content,
 									enum e_request request,
@@ -51,9 +51,9 @@ struct s_packet	*packet_create_json(json_object *content,
 	packet->timestamp = timestamp;
 	packet->json_content = content;
 	packet->is_content_parsed = true;
+	json_object_object_add(content, "request", json_object_new_int(request));
 	json_object_object_add(content, "packet_time_sec", json_object_new_int64(timestamp.tv_sec));
 	json_object_object_add(content, "packet_time_usec", json_object_new_int64(timestamp.tv_usec));
-	json_object_object_add(content, "request", json_object_new_int(request));
 	packet->request = request;
 	return (packet);
 }
@@ -78,11 +78,11 @@ int				packets_equal(struct s_packet *a, struct s_packet *b)
 
 int				packet_free(struct s_packet **packet)
 {
-	if (packet == NULL)
+	if (packet == NULL || *packet == NULL)
 		return (1);
 	free((*packet)->content);
-	if ((*packet)->is_content_parsed && (*packet)->json_content)
-		json_object_put((*packet)->json_content);
+//	if ((*packet)->is_content_parsed && (*packet)->json_content)
+//		json_object_put((*packet)->json_content);
 	free(*packet);
 	*packet = NULL;
 	return (0);

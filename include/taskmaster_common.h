@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/24 12:40:25 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/05 17:11:32 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/06 12:45:59 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@
 # endif
 
 
-#define PACKET_DELIMITER 23
+# define PACKET_DELIMITER 23
 
 # define RESPONSE_TIMEOUT_USECONDS
 
@@ -57,7 +57,6 @@ enum					e_request
 	REQUEST_RESET        = 16,
 	REQUEST_BANISH       = 32,
 	REQUEST_SUMMON       = 64,
-
 };
 
 /*
@@ -79,8 +78,8 @@ typedef int				(*t_resolver_fun)(const struct s_packet *packet);
 
 struct					s_resolver
 {
-	enum e_request command;
-	t_resolver_fun resolver;
+	enum e_request	command;
+	t_resolver_fun	resolver;
 };
 
 enum					e_remote
@@ -109,15 +108,15 @@ extern struct s_resolver	g_resolvers[];
 
 struct s_packet	*packet_create(int socket, const char *contents, struct timeval timestamp);
 struct s_packet	*packet_create_json(json_object *root, enum e_request request, struct timeval timestamp);
-int				packet_enqueue(struct s_packet *packet);
+int				packet_enqueue(struct s_packet **queue_head, struct s_packet *packet);
 int				packet_dequeue(struct s_packet *packet);
 int				packet_free(struct s_packet **packet);
 int				packet_resolve(struct s_packet *packet);
-int				packet_resolve_all(void);
+int				packet_resolve_all(struct s_packet *queue);
 int				packet_resolve_first(enum e_request type);
 
 int				net_send(int socket, struct s_packet *packet);
-int				net_get(int socket);
+int				net_get(const int socket, struct s_packet **queue_head);
 
 /*
 ** Logger
@@ -125,13 +124,13 @@ int				net_get(int socket);
 
 enum				e_log_level
 {
-	LOG_OFF = 0,
-	LOG_FATAL = 1,
-	LOG_SEVERE = 2,
-	LOG_ERROR = 4,
-	LOG_WARN = 8,
-	LOG_INFO = 16,
-	LOG_DEBUG = 128,
+	TLOG_OFF = 0,
+	TLOG_FATAL = 1,
+	TLOG_SEVERE = 2,
+	TLOG_ERROR = 4,
+	TLOG_WARN = 8,
+	TLOG_INFO = 16,
+	TLOG_DEBUG = 128,
 };
 
 int					logger_init(enum e_log_level level, const char *app_name);

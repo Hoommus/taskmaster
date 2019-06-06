@@ -12,7 +12,7 @@
 
 #include "taskmaster_cli.h"
 
-struct s_packet		*pack_to_packet(enum e_request type, const char **args)
+static struct s_packet		*pack_to_packet(enum e_request type, const char **args)
 {
 	json_object		*object;
 	json_object		*tmp;
@@ -61,6 +61,7 @@ int			parse_response_status(const struct s_packet *packet)
 int			tm_status(const char **args)
 {
 	struct s_packet	*request;
+	struct s_packet	*queue;
 	char			*response;
 	int				status;
 
@@ -79,8 +80,8 @@ int			tm_status(const char **args)
 		else
 		{
 			dprintf(2, SH ": seems like sent all, now waiting for response\n");
-			if (net_get(g_shell->daemon->socket_fd) >= 0)
-				status = packet_resolve_all();
+			if (net_get(g_shell->daemon->socket_fd, &queue) >= 0)
+				status = packet_resolve_all(queue);
 		}
 		free((void *)response);
 		return (status);
