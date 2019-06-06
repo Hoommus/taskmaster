@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 19:36:29 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/05 20:00:03 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/06 12:02:17 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,12 +50,11 @@ int			tm_connect(const char **args)
 	{
 		ft_printf("You are already connected to a ");
 		if (g_shell->daemon->domain == AF_LOCAL)
-			ft_printf("\27[1mlocal\27[0m daemon @%s\n", g_shell->daemon->addr.unix.sun_path);
+			ft_printf("local daemon %s\n", g_shell->daemon->addr.unix.sun_path);
 		else
-			ft_printf("\27[1mremote\27[0m daemon @%u\n",
+			ft_printf("remote daemon %u\n",
 				g_shell->daemon->addr.inet.sin_addr.s_addr);
-		ft_printf("Execute `disconnect' command to drop any present connection "
-			"(and `connect' again, if needed)\n");
+		ft_printf("Execute `disconnect' command to drop any present connection\n");
 		return (1);
 	}
 	else if (!args || !args[0])

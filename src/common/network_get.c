@@ -83,32 +83,25 @@ int			get_next_packet(const int fd, char **content)
 
 // TODO: try to reconnect / reaccept, if it is even possible
 // TODO: reject "old" packets or decide what to do with them
-int			net_get(const int socket)
+int			net_get(const int socket, struct s_packet **queue_head)
 {
 	char			*swap;
 	ssize_t			status;
 	struct timeval	time;
-	int				flags;
 
 	errno = 0;
 	swap = NULL;
-	flags = fcntl(socket, F_GETFL, 0);
-	//fcntl(socket, F_SETFL, flags | O_NONBLOCK);
-	dprintf(2, SH ": started getting a packet\n");
 	(status = get_next_packet(socket, &swap));
-	dprintf(2, SH ": finished getting a packet with status %lu\n", status);
 	if (status < 0 && (errno == EPIPE || errno == ENETDOWN ||
 			errno == ENETUNREACH || errno == ENETRESET))
 	{
-		dprintf(2, SH ": unable to receive response from the server: %s\n", strerror(errno));
 		return (-2);
 	}
 	else if (status >= 0 && swap != NULL)
 	{
 		gettimeofday(&time, NULL);
-		packet_enqueue(packet_create(socket, swap, time));
+		packet_enqueue(queue_head, packet_create(socket, swap, time));
 	}
-	fcntl(socket, F_SETFL, flags & (~O_NONBLOCK));
 	return (status);
 }
 

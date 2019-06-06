@@ -45,14 +45,18 @@ TASKMASTER_COMMON_DIR = ../common
 TASKMASTER_COMMON_LIB = $(TASKMASTER_COMMON_DIR)/taskmasterlib.a
 
 DAEMON_SRC = main.c \
-			 process_handling.c\
+			 process_handling.c \
 			 ft_vector.c
 
 CONFIG_DIR = config/
 CONFIG_SRC = config_load.c
 
 NETWORK_DIR = network/
-NETWORK_SRC = sockets_manipulations.c client_interactions.c thread_pool.c
+NETWORK_SRC = sockets_manipulations.c client_interactions.c thread_pool.c \
+              serve_invalid.c \
+              serve_status.c \
+              serve_heartbeat.c \
+              serve_stop.c
 
 OBJ = $(addprefix $(OBJ_DIR), $(DAEMON_SRC:.c=.o))                        \
       $(addprefix $(OBJ_DIR)$(CONFIG_DIR), $(CONFIG_SRC:.c=.o))           \

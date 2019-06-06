@@ -26,6 +26,8 @@
 
 # include <errno.h>
 
+//# include <sys/syslog.h>
+
 # include <sys/resource.h>
 # include <sys/types.h>
 
@@ -56,6 +58,7 @@
 struct				s_thread_pool
 {
 	pthread_t		thread[THREAD_POOL_CAPACITY];
+	struct s_packet	*packet_queues[THREAD_POOL_CAPACITY];
 	void			*args[THREAD_POOL_CAPACITY];
 	bool			is_busy[THREAD_POOL_CAPACITY];
 	int				threads_number;
@@ -189,6 +192,8 @@ int				read_filename(const char *file, char **data);
 void __attribute__((noreturn))	*accept_pthread_loop(void *socket);
 
 int				respond_status(const struct s_packet *packet);
+int				respond_invalid(const struct s_packet *packet);
+int				respond_stop(const struct s_packet *packet);
 
 /*
 ** Network Thread Pool

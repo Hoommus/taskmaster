@@ -1,15 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   network_auxiliary.c                                :+:      :+:    :+:   */
+/*   serve_banish.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/05/28 10:35:56 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/28 11:55:58 by vtarasiu         ###   ########.fr       */
+/*   Created: 2019/06/06 17:34:45 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/06/06 17:36:32 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "taskmaster_cli.h"
+#include "taskmaster_daemon.h"
 
+int							respond_banish(const struct s_packet *packet)
+{
 
+	log_write(TLOG_FATAL, "Client requested daemon banish");
+	return (packet == NULL);
+}

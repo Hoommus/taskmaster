@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:10:31 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/06 21:37:27 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/06 22:14:06 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,10 @@ int		create_sockets(void)
 	status = 0 - (g_master->local == 0);
 	if (status == 0)
 	{
-		listen(g_master->local->fd, 8);
-		log_write(LOG_INFO, "Successfully started listening to a local socket");
+		if (listen(g_master->local->fd, 8) == -1)
+			log_fwrite(TLOG_INFO, "Failed to listen to a local socket: %s", strerror(errno));
+		else
+			log_write(TLOG_INFO, "Successfully started listening to a local socket");
 	}
 //	if (!socket_create_inet("123.456.789.123:4242"))
 //		status -= 1;
@@ -39,38 +41,43 @@ int		create_sockets(void)
 pid_t	create_daemon(void)
 {
 	struct rlimit	limits;
-//	const sigset_t	mask = {0};
+	const sigset_t	mask = {0};
 	pid_t			pid;
 	int32_t			null;
 	u_int64_t		i;
 
 	if (fork() > 0)
 		exit(EXIT_SUCCESS);
-	log_write(LOG_DEBUG, "Successfully forked first time");
+	log_write(TLOG_DEBUG, "Successfully forked first time");
 	i = 2;
 	if (getrlimit(RLIMIT_NOFILE, &limits) == 0)
 		while (++i < limits.rlim_cur)
 			if ((int)i != fileno(logger_get_file()))
 				close(i);
-	log_write(LOG_DEBUG, "Closed all redundant fds");
-//	sigprocmask(SIG_SETMASK, &mask, NULL);
+	log_write(TLOG_DEBUG, "Closed all redundant fds");
+	sigprocmask(SIG_SETMASK, &mask, NULL);
+//	if (getrlimit(RLIMIT_NOFILE, &limits) == 0)
+//		while (++i < limits.rlim_cur)
+//			if ((int)i != fileno(logger_get_file()))
+//				close(i);
+//	log_write(TLOG_DEBUG, "Closed all redundant fds");
 	setsid();
 	umask(0);
-	log_write(LOG_DEBUG, "Set sigprocmask, sid and umask(0)");
+	log_write(TLOG_DEBUG, "Set sigprocmask, sid and umask(0)");
 	if ((pid = fork()) > 0)
 		exit(EXIT_SUCCESS);
 	else if (pid == -1)
 	{
-		log_write(LOG_FATAL, "Failed to fork second time");
+		log_write(TLOG_FATAL, "Failed to fork second time");
 		exit(2);
 	}
-	log_write(LOG_DEBUG, "Successfully forked second time, now we're real daemon");
+	log_write(TLOG_DEBUG, "Successfully forked second time, now we're real daemon");
 	null = open("/dev/null", O_RDWR);
 	dup2(0, null);
 	dup2(1, null);
 	dup2(2, null);
 	close(null);
-	log_write(LOG_DEBUG, "Replaced all standard fds with /dev/null");
+	log_write(TLOG_DEBUG, "Replaced all standard fds with /dev/null");
 	return (pid);
 }
 
@@ -127,7 +134,7 @@ struct s_args		parse_args(int argc, char **argv)
 	static struct s_args			args;
 
 	args.config_file = CONFIG_DEFAULT;
-	args.log_level = LOG_DEBUG; // TODO: change this to LOG_WARN
+	args.log_level = TLOG_DEBUG; // TODO: change this to TLOG_WARN
 	while ((opt = getopt_long(argc, argv, "c:h:", longopts, NULL)) != -1)
 	{
 		if (opt == 1)
@@ -164,19 +171,19 @@ int					main(int argc, char **argv)
 		dprintf(2, "loglevel has unknown level, setting to INFO\n");
 	logger_init(args.log_level, argv[0]);
 	g_master = calloc(1, sizeof(struct s_master));
-	log_write(LOG_DEBUG, "Initialising daemon");
+	log_write(TLOG_DEBUG, "Initialising daemon");
 	create_daemon();
 	tpool_init();
-	log_write(LOG_DEBUG, "Creating sockets");
+	log_write(TLOG_DEBUG, "Creating sockets");
 
 	sigemptyset(&sigset);
 	sigaddset(&sigset, SIGCHLD);
 	sigaddset(&sigset, SIGINT);
 	if ((err = pthread_sigmask(SIG_BLOCK, &sigset, &osigset)))
-		log_write(LOG_ERROR, "PTHREAD_SIGMASK error\n");
+		log_write(TLOG_ERROR, "PTHREAD_SIGMASK error\n");
 
 	if (create_sockets() == -1)
-		log_write(LOG_ERROR, "Failed to create some sockets");
+		log_write(TLOG_ERROR, "Failed to create some sockets");
 	else
 		tpool_create_thread(NULL, accept_pthread_loop, tpool_arg(g_master->local->fd));
 
@@ -187,14 +194,13 @@ int					main(int argc, char **argv)
 	while (ponies_teleported())
 	{
 		if ((err = sigwait(&sigset, &signo)))
-			log_write(LOG_ERROR, "SIGWAIT error");
+			log_write(TLOG_ERROR, "SIGWAIT error");
 		if (signo == SIGCHLD)
 		{
-			log_write(LOG_DEBUG, "SIGCHLD yep");
+			log_write(TLOG_DEBUG, "SIGCHLD received");
 			sigchld_handler();
 			d_restart();
 		}
-		log_write(LOG_DEBUG, "SIG yep");
 	}
 	return (0);
 }

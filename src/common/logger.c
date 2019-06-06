@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/04 13:03:25 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/05 20:18:33 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/06 12:08:07 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,17 +33,17 @@ static const char		*logger_level_str(enum e_log_level level)
 		"OFF", "INFO", "WARN", "ERROR", "FATAL", "DEBUG", "SEVERE"
 	};
 
-	if (level == LOG_INFO)
+	if (level == TLOG_INFO)
 		return (levels[1]);
-	if (level == LOG_WARN)
+	if (level == TLOG_WARN)
 		return (levels[2]);
-	if (level == LOG_ERROR)
+	if (level == TLOG_ERROR)
 		return (levels[3]);
-	if (level == LOG_FATAL)
+	if (level == TLOG_FATAL)
 		return (levels[4]);
-	if (level == LOG_DEBUG)
+	if (level == TLOG_DEBUG)
 		return (levels[5]);
-	if (level == LOG_SEVERE)
+	if (level == TLOG_SEVERE)
 		return (levels[6]);
 	return ("Are you serious? Logger is disabled.");
 }
@@ -55,21 +55,21 @@ enum e_log_level		logger_level_parse(const char *str)
 
 	copy = strdup(str);
 	if (strcmp(copy, "OFF") == 0)
-		level = (LOG_OFF);
+		level = (TLOG_OFF);
 	else if (strcmp(copy, "INFO") == 0)
-		level = (LOG_INFO);
+		level = (TLOG_INFO);
 	else if (strcmp(copy, "WARN") == 0)
-		level = (LOG_WARN);
+		level = (TLOG_WARN);
 	else if (strcmp(copy, "ERROR") == 0)
-		level = (LOG_ERROR);
+		level = (TLOG_ERROR);
 	else if (strcmp(copy, "FATAL") == 0)
-		level = (LOG_FATAL);
+		level = (TLOG_FATAL);
 	else if (strcmp(copy, "DEBUG") == 0)
-		level = (LOG_DEBUG);
+		level = (TLOG_DEBUG);
 	else if (strcmp(copy, "SEVERE") == 0)
-		level = (LOG_SEVERE);
+		level = (TLOG_SEVERE);
 	else if (strcmp(copy, "ALL") == 0)
-		level = (LOG_DEBUG);
+		level = (TLOG_DEBUG);
 	else
 		level = -1;
 	free(copy);
@@ -83,7 +83,7 @@ int						logger_init(enum e_log_level level, const char *app_name)
 	char			*env;
 
 	bzero(buf, sizeof(buf));
-	g_logger.level = level == (enum e_log_level)-1 ? LOG_WARN : level;
+	g_logger.level = level == (enum e_log_level)-1 ? TLOG_WARN : level;
 	if ((env = getenv("TASKMASTER_LOGFILE")))
 		g_logger.logfile = fopen(env, "a+");
 	else
@@ -98,7 +98,7 @@ int						logger_init(enum e_log_level level, const char *app_name)
 	}
 	fseek(g_logger.logfile, 0L, SEEK_END);
 	pthread_mutex_init(&g_logfile_mutex, NULL);
-	log_fwrite(LOG_INFO, "logger for %s [%d] started", app_name, getpid());
+	log_fwrite(TLOG_INFO, "logger for %s [%d] started", app_name, getpid());
 	return (0);
 }
 

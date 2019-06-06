@@ -22,12 +22,12 @@ struct s_builtin	g_builtins[] = {
 	{"connect", &tm_connect},
 	{"disconnect", &tm_disconnect},
 	{"drop", &tm_disconnect},
-	{"echo", &hs_echo},
 	{"exit", &hs_exit},
 	{"history", &hs_history},
 	{"help", &hs_help},
 	{"quit", &hs_exit},
 	{"status", &tm_status},
+	{"stop", &tm_stop},
 	{"tokenizer", &hs_tokenizer},
 	{NULL, NULL}
 };
