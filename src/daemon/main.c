@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:10:31 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/06 14:08:43 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/06 18:44:32 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int		create_sockets(void)
 pid_t	create_daemon(void)
 {
 	struct rlimit	limits;
-	const sigset_t	mask = {0};
+//	const sigset_t	mask = {0};
 	pid_t			pid;
 	int32_t			null;
 	u_int64_t		i;
@@ -53,7 +53,7 @@ pid_t	create_daemon(void)
 			if ((int)i != fileno(logger_get_file()))
 				close(i);
 	log_write(LOG_DEBUG, "Closed all redundant fds");
-	sigprocmask(SIG_SETMASK, &mask, NULL);
+//	sigprocmask(SIG_SETMASK, &mask, NULL);
 	setsid();
 	umask(0);
 	log_write(LOG_DEBUG, "Set sigprocmask, sid and umask(0)");
@@ -153,6 +153,8 @@ int					main(int argc, char **argv)
 	sigset_t			sigset;
 	sigset_t			osigset;
 	struct s_args		args;
+	int					err;
+	int					signo;
 
 	remove(SOCKET_FILE);
 	args = parse_args(argc - 1, argv + 1);
@@ -166,6 +168,13 @@ int					main(int argc, char **argv)
 	create_daemon();
 	tpool_init();
 	log_write(LOG_DEBUG, "Creating sockets");
+
+	sigemptyset(&sigset);
+	sigaddset(&sigset, SIGCHLD);
+	sigaddset(&sigset, SIGINT);
+	if ((err = pthread_sigmask(SIG_BLOCK, &sigset, &osigset)))
+		log_write(LOG_ERROR, "PTHREAD_SIGMASK error\n");
+
 	if (create_sockets() == -1)
 		log_write(LOG_ERROR, "Failed to create some sockets");
 	else
@@ -173,17 +182,21 @@ int					main(int argc, char **argv)
 
 	g_jobs = (t_ftvector *)malloc(sizeof(t_ftvector));
 
-	sigemptyset(&sigset);
-	sigset |= SIGCHLD;
-	sigprocmask(SIG_BLOCK, &sigset, &osigset);
 	process_handling();
-//	sigprocmask(SIG_SETMASK, &osigset, NULL);
 	atexit(destructor);
 	while (ponies_teleported())
 	{
-		if (sigsuspend(&osigset) != -1)
-			log_write(LOG_ERROR, "SIGSUSPEND error\n");
-		d_restart();
+//		if (sigsuspend(&osigset) != -1)
+//			log_write(LOG_ERROR, "SIGSUSPEND error\n");
+		if ((err = sigwait(&sigset, &signo)))
+			log_write(LOG_ERROR, "SIGWAIT error\n");
+		if (signo == SIGCHLD)
+		{
+			log_write(LOG_DEBUG, "SIGCHLD yep\n");
+			sigchld_handler(signo);
+			d_restart();
+		}
+		log_write(LOG_DEBUG, "SIG yep\n");
 //		pause();
 //		if (errno == EAGAIN)
 //		{

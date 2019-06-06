@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/23 17:58:26 by obamzuro          #+#    #+#             */
-/*   Updated: 2019/06/04 16:48:46 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/06 18:14:30 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 char		*argsHardcoded[] =
 {
 	"/bin/bash", "src/daemon/echoer.sh", NULL
+//	"/usr/bin/base64", "/dev/urandom", NULL
 };
 
 int8_t		expected_statuses[] =
@@ -83,7 +84,6 @@ int			jobs_filler()
 	hardjob->origin = ORIGIN_CONFIG;
 	init_ftvector(g_jobs);
 	push_ftvector(g_jobs, hardjob);
-	dprintf(g_master->logfile, "Filler for %d job\n", 0);
 	return (0);
 }
 
@@ -190,13 +190,13 @@ void		d_start(int iter)
 //	struct tms	process_time;
 
 	currentjob = (t_job *)g_jobs->elem[iter];
-	dprintf(g_master->logfile, "Fork for %d job\n", iter);
+	log_fwrite(LOG_DEBUG, "Fork for %d job\n", iter);
 	// TODO: handle overflow time limit
 	currentjob->time_begin = time(NULL);
 	currentjob->state = STARTING;
 	process = fork();
 	if (process == -1)
-		dprintf(g_master->logfile, "Failed to fork %d job\n", iter);
+		log_fwrite(LOG_ERROR, "Failed to fork %d job\n", iter);
 	else if (process == 0)
 	{
 		envp = create_new_env(currentjob);
@@ -204,14 +204,14 @@ void		d_start(int iter)
 		umask(currentjob->umask);
 		if (handle_redirections(currentjob) == -1)
 		{
-			dprintf(g_master->logfile, "redirections failed!\n%s\n", strerror(errno));
+			log_fwrite(LOG_ERROR, "redirections failed!\n%s\n", strerror(errno));
 			exit(228);
 		}
 		else
-			dprintf(g_master->logfile, "redirections successed!\n");
+			log_fwrite(LOG_ERROR, "redirections successed!\n");
 		if (execve(currentjob->args[0], currentjob->args, envp) == -1)
 		{
-			dprintf(g_master->logfile, "exec failed!\n%s\n", strerror(errno));
+			log_fwrite(LOG_ERROR, "exec failed!\n%s\n", strerror(errno));
 			exit(228);
 		}
 	}
@@ -242,14 +242,14 @@ void		d_restart()
 		job = (t_job *)g_jobs->elem[i];
 		if (job->state == EXITED)
 		{
-			dprintf(g_master->logfile, "RESTART %d job(%s) after exit\n", i, job->args[0]);
+			log_fwrite(LOG_DEBUG, "RESTART %d job(%s) after exit\n", i, job->args[0]);
 			d_start(i);
 		}
 		else if (job->state == FATAL)
-			dprintf(g_master->logfile, "FATAL %d job(%s)\n", i, job->args[0]);
+			log_fwrite(LOG_DEBUG, "FATAL %d job(%s)\n", i, job->args[0]);
 		else if (job->state == BACKOFF)
 		{
-			dprintf(g_master->logfile, "RESTART %d job(%s) after unsuccessfull run\n", i, job->args[0]);
+			log_fwrite(LOG_DEBUG, "RESTART %d job(%s) after unsuccessfull run\n", i, job->args[0]);
 			d_start(i);
 		}
 		++i;
@@ -288,30 +288,32 @@ void		alrm_handler(int signo __attribute__((unused)))
 		alarm(mindif);
 }
 
+void		sigchld_wrapper(int signo __attribute__((unused))) {};
+
 void		signal_attempting()
 {
-//	struct sigaction	act;
+	struct sigaction	act;
 //
+	act.sa_handler = NULL;
+	act.sa_handler = sigchld_wrapper;//igchld_handler;
+	sigemptyset(&act.sa_mask);
+	act.sa_flags = 0;
+#ifdef SA_INTERRUPT
+	act.sa_flags |= SA_INTERRUPT;
+#endif
+	if (sigaction(SIGCHLD, &act, NULL) < 0)
+		exit(123);
+	act.sa_handler = alrm_handler;
 //	act.sa_handler = NULL;
-//	act.sa_sigaction = sigchld_handler;
-//	sigemptyset(&act.sa_mask);
-//	act.sa_flags = 0;
-//#ifdef SA_INTERRUPT
-//	act.sa_flags |= SA_INTERRUPT;
-//#endif
-//	if (sigaction(SIGCHLD, &act, NULL) < 0)
-//		exit(123);
-//	act.sa_handler = alrm_handler;
-////	act.sa_handler = NULL;
-//	act.sa_sigaction = NULL;
-//	sigemptyset(&act.sa_mask);
-//	// hz
-//	sigaddset(&act.sa_mask, SIGCHLD);
-//	act.sa_flags = 0;
-//	act.sa_flags |= SA_NODEFER;// | SA_SIGINFO;
-//	if (sigaction(SIGALRM, &act, NULL) < 0)
-//		exit (123);
-//	dprintf(g_master->logfile, "Signals handled\n");
+	act.sa_sigaction = NULL;
+	sigemptyset(&act.sa_mask);
+	// hz
+	sigaddset(&act.sa_mask, SIGCHLD);
+	act.sa_flags = 0;
+	act.sa_flags |= SA_NODEFER;// | SA_SIGINFO;
+	if (sigaction(SIGALRM, &act, NULL) < 0)
+		exit (123);
+	log_write(LOG_DEBUG, "Signals handled\n");
 }
 
 void		process_handling()
@@ -319,9 +321,8 @@ void		process_handling()
 	int			i;
 
 	jobs_filler();
-//	signal_attempting();
+	signal_attempting();
 	i = -1;
 	while (++i < g_jobs->len)
 		d_start(i);
-	dprintf(g_master->logfile, "process handled\n");
 }
