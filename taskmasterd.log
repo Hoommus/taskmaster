@@ -131258,3 +131258,202 @@ DEBUG  [07.06.2019 17:10:05.3492] Signals handled
 DEBUG  [07.06.2019 17:10:05.3493] Fork for 0 job, 0 process
 DEBUG  [07.06.2019 17:10:05.3501] redirections successed!
 
+INFO   [07.06.2019 17:13:26.8864] logger for ./taskmasterd [81577] started
+DEBUG  [07.06.2019 17:13:26.8872] Initialising daemon
+DEBUG  [07.06.2019 17:13:26.8879] Successfully forked first time
+DEBUG  [07.06.2019 17:13:26.8922] Closed all redundant fds
+DEBUG  [07.06.2019 17:13:26.8925] Set sigprocmask, sid and umask(0)
+DEBUG  [07.06.2019 17:13:26.8935] Successfully forked second time, now we're real daemon
+DEBUG  [07.06.2019 17:13:26.8938] Replaced all standard fds with /dev/null
+DEBUG  [07.06.2019 17:13:26.8940] Thread pool initialized
+DEBUG  [07.06.2019 17:13:26.8942] Creating sockets
+DEBUG  [07.06.2019 17:13:26.8947] Successfully created socket at /var/tmp/taskmasterd.socket (fd: 4)
+INFO   [07.06.2019 17:13:26.8949] Successfully started listening to a local socket
+DEBUG  [07.06.2019 17:13:26.8950] Locking a tpool mutex
+DEBUG  [07.06.2019 17:13:26.8952] Found not busy thread, assigning id
+DEBUG  [07.06.2019 17:13:26.8954] pthread created successfully, assigning args
+DEBUG  [07.06.2019 17:13:26.8955] marking thread busy
+DEBUG  [07.06.2019 17:13:26.8957] incrementing number of running threads
+DEBUG  [07.06.2019 17:13:26.8958] unlocking a tpool mutex
+DEBUG  [07.06.2019 17:13:26.8960] Signals handled
+
+DEBUG  [07.06.2019 17:13:26.8962] Fork for 0 job, 0 process
+DEBUG  [07.06.2019 17:13:26.8964] Started thread for 4 socket
+DEBUG  [07.06.2019 17:13:26.8969] redirections successed!
+
+INFO   [07.06.2019 17:16:44.0220] logger for ./taskmasterd [82038] started
+DEBUG  [07.06.2019 17:16:44.0227] Initialising daemon
+DEBUG  [07.06.2019 17:16:44.0232] Successfully forked first time
+DEBUG  [07.06.2019 17:16:44.0273] Closed all redundant fds
+DEBUG  [07.06.2019 17:16:44.0276] Set sigprocmask, sid and umask(0)
+DEBUG  [07.06.2019 17:16:44.0292] Successfully forked second time, now we're real daemon
+DEBUG  [07.06.2019 17:16:44.0295] Replaced all standard fds with /dev/null
+DEBUG  [07.06.2019 17:16:44.0297] Thread pool initialized
+DEBUG  [07.06.2019 17:16:44.0299] Creating sockets
+DEBUG  [07.06.2019 17:16:44.0302] Successfully created socket at /var/tmp/taskmasterd.socket (fd: 4)
+INFO   [07.06.2019 17:16:44.0304] Successfully started listening to a local socket
+DEBUG  [07.06.2019 17:16:44.0305] Locking a tpool mutex
+DEBUG  [07.06.2019 17:16:44.0307] Found not busy thread, assigning id
+DEBUG  [07.06.2019 17:16:44.0309] pthread created successfully, assigning args
+DEBUG  [07.06.2019 17:16:44.0310] marking thread busy
+DEBUG  [07.06.2019 17:16:44.0312] incrementing number of running threads
+DEBUG  [07.06.2019 17:16:44.0313] unlocking a tpool mutex
+DEBUG  [07.06.2019 17:16:44.0315] Signals handled
+
+DEBUG  [07.06.2019 17:16:44.0316] Fork for 0 job, 0 process
+DEBUG  [07.06.2019 17:16:44.0319] Started thread for 4 socket
+DEBUG  [07.06.2019 17:16:44.0325] redirections successed!
+
+INFO   [07.06.2019 17:17:17.7843] Connected new local client
+DEBUG  [07.06.2019 17:17:17.7846] Locking a tpool mutex
+DEBUG  [07.06.2019 17:17:17.7849] Found not busy thread, assigning id
+DEBUG  [07.06.2019 17:17:17.7851] pthread created successfully, assigning args
+INFO   [07.06.2019 17:17:17.7853] Started listening packets
+DEBUG  [07.06.2019 17:17:17.7856] marking thread busy
+DEBUG  [07.06.2019 17:17:17.7858] incrementing number of running threads
+DEBUG  [07.06.2019 17:17:17.7861] unlocking a tpool mutex
+INFO   [07.06.2019 17:18:52.2769] logger for ./taskmasterd [82550] started
+DEBUG  [07.06.2019 17:18:52.2776] Initialising daemon
+DEBUG  [07.06.2019 17:18:52.2782] Successfully forked first time
+DEBUG  [07.06.2019 17:18:52.2825] Closed all redundant fds
+DEBUG  [07.06.2019 17:18:52.2829] Set sigprocmask, sid and umask(0)
+DEBUG  [07.06.2019 17:18:52.2835] Successfully forked second time, now we're real daemon
+DEBUG  [07.06.2019 17:18:52.2839] Replaced all standard fds with /dev/null
+DEBUG  [07.06.2019 17:18:52.2841] Thread pool initialized
+DEBUG  [07.06.2019 17:18:52.2843] Creating sockets
+DEBUG  [07.06.2019 17:18:52.2847] Successfully created socket at /var/tmp/taskmasterd.socket (fd: 4)
+INFO   [07.06.2019 17:18:52.2850] Successfully started listening to a local socket
+DEBUG  [07.06.2019 17:18:52.2852] Locking a tpool mutex
+DEBUG  [07.06.2019 17:18:52.2854] Found not busy thread, assigning id
+DEBUG  [07.06.2019 17:18:52.2857] pthread created successfully, assigning args
+DEBUG  [07.06.2019 17:18:52.2859] Started thread for 4 socket
+DEBUG  [07.06.2019 17:18:52.2862] marking thread busy
+DEBUG  [07.06.2019 17:18:52.2865] incrementing number of running threads
+DEBUG  [07.06.2019 17:18:52.2867] unlocking a tpool mutex
+DEBUG  [07.06.2019 17:18:52.2871] Signals handled
+
+DEBUG  [07.06.2019 17:18:52.2874] Fork for 0 job, 0 process
+DEBUG  [07.06.2019 17:18:52.2884] redirections successed!
+
+INFO   [07.06.2019 17:19:11.8714] Connected new local client
+DEBUG  [07.06.2019 17:19:11.8719] Locking a tpool mutex
+DEBUG  [07.06.2019 17:19:11.8721] Found not busy thread, assigning id
+DEBUG  [07.06.2019 17:19:11.8724] pthread created successfully, assigning args
+INFO   [07.06.2019 17:19:11.8726] Started listening packets
+DEBUG  [07.06.2019 17:19:11.8729] marking thread busy
+DEBUG  [07.06.2019 17:19:11.8732] incrementing number of running threads
+DEBUG  [07.06.2019 17:19:11.8734] unlocking a tpool mutex
+INFO   [07.06.2019 17:19:20.1519] Received some packets, resolving requests
+INFO   [07.06.2019 17:19:20.1521] Client requested all job stop
+INFO   [07.06.2019 17:19:20.1525] Successfully reported status to client
+INFO   [07.06.2019 17:19:20.1533] Client dropped connection
+DEBUG  [07.06.2019 17:19:20.1536] Finalising 1 thread
+INFO   [07.06.2019 17:24:28.3083] logger for ./taskmasterd [83038] started
+DEBUG  [07.06.2019 17:24:28.3091] Initialising daemon
+DEBUG  [07.06.2019 17:24:28.3095] Successfully forked first time
+DEBUG  [07.06.2019 17:24:28.3132] Closed all redundant fds
+DEBUG  [07.06.2019 17:24:28.3134] Set sigprocmask, sid and umask(0)
+DEBUG  [07.06.2019 17:24:28.3142] Successfully forked second time, now we're real daemon
+DEBUG  [07.06.2019 17:24:28.3146] Replaced all standard fds with /dev/null
+DEBUG  [07.06.2019 17:24:28.3147] Thread pool initialized
+DEBUG  [07.06.2019 17:24:28.3150] Creating sockets
+DEBUG  [07.06.2019 17:24:28.3153] Successfully created socket at /var/tmp/taskmasterd.socket (fd: 4)
+INFO   [07.06.2019 17:24:28.3155] Successfully started listening to a local socket
+DEBUG  [07.06.2019 17:24:28.3157] Locking a tpool mutex
+DEBUG  [07.06.2019 17:24:28.3158] Found not busy thread, assigning id
+DEBUG  [07.06.2019 17:24:28.3160] pthread created successfully, assigning args
+DEBUG  [07.06.2019 17:24:28.3162] Started thread for 4 socket
+DEBUG  [07.06.2019 17:24:28.3165] marking thread busy
+DEBUG  [07.06.2019 17:24:28.3168] incrementing number of running threads
+DEBUG  [07.06.2019 17:24:28.3170] unlocking a tpool mutex
+DEBUG  [07.06.2019 17:24:28.3172] Signals handled
+
+DEBUG  [07.06.2019 17:24:28.3174] Fork for 0 job, 0 process
+DEBUG  [07.06.2019 17:24:28.3181] redirections successed!
+
+INFO   [07.06.2019 17:24:43.1186] Connected new local client
+DEBUG  [07.06.2019 17:24:43.1190] Locking a tpool mutex
+DEBUG  [07.06.2019 17:24:43.1192] Found not busy thread, assigning id
+DEBUG  [07.06.2019 17:24:43.1194] pthread created successfully, assigning args
+INFO   [07.06.2019 17:24:43.1196] Started listening packets
+DEBUG  [07.06.2019 17:24:43.1199] marking thread busy
+DEBUG  [07.06.2019 17:24:43.1201] incrementing number of running threads
+DEBUG  [07.06.2019 17:24:43.1204] unlocking a tpool mutex
+INFO   [07.06.2019 17:24:45.5748] Received some packets, resolving requests
+INFO   [07.06.2019 17:24:45.5750] Client requested all job stop
+INFO   [07.06.2019 17:29:04.0108] logger for ./taskmasterd [83600] started
+DEBUG  [07.06.2019 17:29:04.0115] Initialising daemon
+DEBUG  [07.06.2019 17:29:04.0120] Successfully forked first time
+DEBUG  [07.06.2019 17:29:04.0159] Closed all redundant fds
+DEBUG  [07.06.2019 17:29:04.0161] Set sigprocmask, sid and umask(0)
+DEBUG  [07.06.2019 17:29:04.0177] Successfully forked second time, now we're real daemon
+DEBUG  [07.06.2019 17:29:04.0181] Replaced all standard fds with /dev/null
+DEBUG  [07.06.2019 17:29:04.0183] Thread pool initialized
+DEBUG  [07.06.2019 17:29:04.0185] Creating sockets
+DEBUG  [07.06.2019 17:29:04.0189] Successfully created socket at /var/tmp/taskmasterd.socket (fd: 4)
+INFO   [07.06.2019 17:29:04.0191] Successfully started listening to a local socket
+DEBUG  [07.06.2019 17:29:04.0193] Locking a tpool mutex
+DEBUG  [07.06.2019 17:29:04.0194] Found not busy thread, assigning id
+DEBUG  [07.06.2019 17:29:04.0197] Started thread for 4 socket
+DEBUG  [07.06.2019 17:29:04.0201] pthread created successfully, assigning args
+DEBUG  [07.06.2019 17:29:04.0202] marking thread busy
+DEBUG  [07.06.2019 17:29:04.0205] incrementing number of running threads
+DEBUG  [07.06.2019 17:29:04.0208] unlocking a tpool mutex
+DEBUG  [07.06.2019 17:29:04.0210] Signals handled
+
+DEBUG  [07.06.2019 17:29:04.0212] Fork for 0 job, 0 process
+DEBUG  [07.06.2019 17:29:04.0225] redirections successed!
+
+INFO   [07.06.2019 17:29:15.8932] Connected new local client
+DEBUG  [07.06.2019 17:29:15.8934] Locking a tpool mutex
+DEBUG  [07.06.2019 17:29:15.8937] Found not busy thread, assigning id
+DEBUG  [07.06.2019 17:29:15.8939] pthread created successfully, assigning args
+INFO   [07.06.2019 17:29:15.8942] Started listening packets
+DEBUG  [07.06.2019 17:29:15.8944] marking thread busy
+DEBUG  [07.06.2019 17:29:15.8947] incrementing number of running threads
+DEBUG  [07.06.2019 17:29:15.8949] unlocking a tpool mutex
+INFO   [07.06.2019 17:29:20.5658] Received some packets, resolving requests
+INFO   [07.06.2019 17:29:20.5661] Client requested all job stop
+DEBUG  [07.06.2019 17:29:20.5663] stop 0 job, 0 process
+INFO   [07.06.2019 17:29:20.5666] Successfully reported status to client
+INFO   [07.06.2019 17:29:20.5669] Client dropped connection
+DEBUG  [07.06.2019 17:29:20.5672] Finalising 1 thread
+INFO   [07.06.2019 17:35:34.4574] logger for ./taskmasterd [84430] started
+DEBUG  [07.06.2019 17:35:34.4582] Initialising daemon
+DEBUG  [07.06.2019 17:35:34.4588] Successfully forked first time
+DEBUG  [07.06.2019 17:35:34.4627] Closed all redundant fds
+DEBUG  [07.06.2019 17:35:34.4632] Set sigprocmask, sid and umask(0)
+DEBUG  [07.06.2019 17:35:34.4638] Successfully forked second time, now we're real daemon
+DEBUG  [07.06.2019 17:35:34.4641] Replaced all standard fds with /dev/null
+DEBUG  [07.06.2019 17:35:34.4643] Thread pool initialized
+DEBUG  [07.06.2019 17:35:34.4645] Creating sockets
+DEBUG  [07.06.2019 17:35:34.4648] Successfully created socket at /var/tmp/taskmasterd.socket (fd: 4)
+INFO   [07.06.2019 17:35:34.4650] Successfully started listening to a local socket
+DEBUG  [07.06.2019 17:35:34.4653] Locking a tpool mutex
+DEBUG  [07.06.2019 17:35:34.4654] Found not busy thread, assigning id
+DEBUG  [07.06.2019 17:35:34.4657] pthread created successfully, assigning args
+DEBUG  [07.06.2019 17:35:34.4658] Started thread for 4 socket
+DEBUG  [07.06.2019 17:35:34.4661] marking thread busy
+DEBUG  [07.06.2019 17:35:34.4663] incrementing number of running threads
+DEBUG  [07.06.2019 17:35:34.4665] unlocking a tpool mutex
+DEBUG  [07.06.2019 17:35:34.4667] Signals handled
+
+DEBUG  [07.06.2019 17:35:34.4668] Fork for 0 job, 0 process
+DEBUG  [07.06.2019 17:35:34.4677] redirections successed!
+
+INFO   [07.06.2019 17:35:41.2678] Connected new local client
+DEBUG  [07.06.2019 17:35:41.2682] Locking a tpool mutex
+DEBUG  [07.06.2019 17:35:41.2685] Found not busy thread, assigning id
+DEBUG  [07.06.2019 17:35:41.2687] pthread created successfully, assigning args
+INFO   [07.06.2019 17:35:41.2689] Started listening packets
+DEBUG  [07.06.2019 17:35:41.2693] marking thread busy
+DEBUG  [07.06.2019 17:35:41.2695] incrementing number of running threads
+DEBUG  [07.06.2019 17:35:41.2697] unlocking a tpool mutex
+INFO   [07.06.2019 17:35:46.7802] Received some packets, resolving requests
+INFO   [07.06.2019 17:35:46.7804] Client requested all job stop
+DEBUG  [07.06.2019 17:35:46.7808] stop 0 job, 0 process
+INFO   [07.06.2019 17:35:46.7811] Successfully reported status to client
+INFO   [07.06.2019 17:35:46.7815] Client dropped connection
+DEBUG  [07.06.2019 17:35:46.7818] Finalising 1 thread
+DEBUG  [07.06.2019 17:35:56.7841] SIGALRM received
+DEBUG  [07.06.2019 17:35:56.7847] SIGCHLD received

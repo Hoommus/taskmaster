@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:10:31 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/06 22:14:06 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/07 17:35:10 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,6 +179,7 @@ int					main(int argc, char **argv)
 	sigemptyset(&sigset);
 	sigaddset(&sigset, SIGCHLD);
 	sigaddset(&sigset, SIGINT);
+	sigaddset(&sigset, SIGALRM);
 	if ((err = pthread_sigmask(SIG_BLOCK, &sigset, &osigset)))
 		log_write(TLOG_ERROR, "PTHREAD_SIGMASK error\n");
 
@@ -200,6 +201,11 @@ int					main(int argc, char **argv)
 			log_write(TLOG_DEBUG, "SIGCHLD received");
 			sigchld_handler();
 			d_restart();
+		}
+		else if (signo == SIGALRM)
+		{
+			log_write(TLOG_DEBUG, "SIGALRM received");
+			alrm_handler(signo);
 		}
 	}
 	return (0);

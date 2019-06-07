@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/06 17:45:55 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/06 18:38:37 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/07 17:18:21 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int							respond_stop(const struct s_packet *packet)
 	job_name = json_object_get_string(json_object_object_get(packet->json_content, "job_name"));
 	log_fwrite(TLOG_INFO, "Client requested %s job stop", job_name);
 
-	// TODO: d_stop
+	d_stop(0, 0);
 
 	root = json_object_new_object();
 	json_object_object_add(root, "success", json_object_new_int(1));

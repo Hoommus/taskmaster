@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/23 17:58:26 by obamzuro          #+#    #+#             */
-/*   Updated: 2019/06/07 17:08:50 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/07 17:35:06 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,9 +203,11 @@ void		d_stop(const unsigned int job_num, const unsigned int process_num)
 	current_process = &current_job->processes[process_num];
 	current_process->state = STOPPING;
 	time(&current_process->time_stop);
+	kill(current_process->pid, current_job->graceful_stop_signal);
 	ret = alarm(current_job->graceful_stop_timeout);
 	if (ret && ret < current_job->graceful_stop_timeout)
 		alarm(current_job->graceful_stop_timeout);
+	log_fwrite(TLOG_DEBUG, "stop %d job, %d process", job_num, process_num);
 }
 
 void		d_start(const int job_num, const int process_num)
