@@ -81,8 +81,8 @@ int				packet_free(struct s_packet **packet)
 	if (packet == NULL || *packet == NULL)
 		return (1);
 	free((*packet)->content);
-//	if ((*packet)->is_content_parsed && (*packet)->json_content)
-//		json_object_put((*packet)->json_content);
+	if ((*packet)->is_content_parsed && (*packet)->json_content)
+		json_object_put((*packet)->json_content);
 	free(*packet);
 	*packet = NULL;
 	return (0);

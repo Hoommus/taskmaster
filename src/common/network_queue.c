@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/27 18:40:07 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/06 20:12:35 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/06 20:19:13 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,13 +44,12 @@ int				packet_resolve_all(struct s_packet *queue)
 			if (g_resolvers[i].command == queue->request)
 			{
 				g_resolvers[i].resolver(queue);
-
 			}
 			i++;
 		}
 		backup = queue;
 		queue = queue->next;
-		//packet_free(&backup);
+		packet_free(&backup);
 	}
 	return (0);
 }

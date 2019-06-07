@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/06 18:17:55 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/06 21:36:08 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/06 21:36:42 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,5 +54,4 @@ int						tm_stop(const char **args)
 		return (status);
 	}
 	return (0);
-
 }

@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/05/20 12:51:40 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/06/03 18:14:54 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/06/07 10:49:16 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ CC = clang
 FLAGS = -DSH=\"$(NAME)\" \
                -Wall  \
                -Wextra \
-               -Werror -g -fsanitize=address
+               -Werror -g #-fsanitize=address
 
 LIB_DIR = ../../lib
 INCLUDE_DIR = ../../include
@@ -93,9 +93,8 @@ libs:
 
 clean:
 	/bin/rm -rf $(OBJ_DIR)
-	/bin/rm -f $(NAME)
 
-fclean:
+fclean: clean
 	/bin/rm -f $(NAME)
 
 re: fclean all

@@ -17,7 +17,7 @@ CC = clang
 FLAGS = -DSH=\"$(NAME)\" \
                -Wall  \
                -Wextra \
-               -Werror -g -fsanitize=address
+               -Werror -g
 
 LIB_DIR = ../../lib
 

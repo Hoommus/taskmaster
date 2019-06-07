@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/24 12:34:01 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/03 11:46:12 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/07 11:44:43 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,16 +74,17 @@ int			tm_status(const char **args)
 	else
 	{
 		request = pack_to_packet(REQUEST_STATUS, args);
-		dprintf(2, SH ": sending request...\n");
 		if (net_send(g_shell->daemon->socket_fd, request) != 0)
-			dprintf(2, SH ": failed to send request: %s\n", strerror(errno));
+			dprintf(2, SH ": failed to send request: %s\n",
+				errno == EPIPE ? "server dropped connection" : strerror(errno));
 		else
 		{
-			dprintf(2, SH ": seems like sent all, now waiting for response\n");
+			queue = NULL;
 			if (net_get(g_shell->daemon->socket_fd, &queue) >= 0)
 				status = packet_resolve_all(queue);
 		}
 		free((void *)response);
+		packet_free(&request);
 		return (status);
 	}
 	return (0);

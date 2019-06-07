@@ -101,6 +101,7 @@ int			net_get(const int socket, struct s_packet **queue_head)
 	{
 		gettimeofday(&time, NULL);
 		packet_enqueue(queue_head, packet_create(socket, swap, time));
+		ft_strdel(&swap);
 	}
 	return (status);
 }

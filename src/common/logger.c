@@ -122,7 +122,7 @@ int						log_fwrite(enum e_log_level level, const char *format, ...)
 	time(&tm);
 	gettimeofday(&timeval, NULL);
 	strftime(date_buf, 1024, "%d.%m.%Y %T", localtime(&tm));
-	fprintf(g_logger.logfile, "%-6s [%s.%-4d] ", logger_level_str(level),
+	fprintf(g_logger.logfile, "%-6s [%s.%04d] ", logger_level_str(level),
 			date_buf, timeval.tv_usec / 100);
 	vfprintf(g_logger.logfile, format, args);
 	fprintf(g_logger.logfile, "\n");
