@@ -6,13 +6,14 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 19:36:29 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/06 12:02:17 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/07 12:29:31 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "taskmaster_cli.h"
 
 #define SOCKET_FILE "/var/tmp/taskmasterd.socket"
+static struct timeval	g_timeouts;
 
 // TODO: use sysctl() to retrieve information about running taskmasterd processes
 int			connect_socket_unix(void)
@@ -37,6 +38,10 @@ int			connect_socket_unix(void)
 	}
 	else
 	{
+		g_timeouts.tv_sec = 7;
+		g_timeouts.tv_usec = 0;
+		setsockopt(daemon->socket_fd, SOL_SOCKET, SO_SNDTIMEO, &g_timeouts, sizeof(g_timeouts));
+		setsockopt(daemon->socket_fd, SOL_SOCKET, SO_RCVTIMEO, &g_timeouts, sizeof(g_timeouts));
 		printf("Connection successful. Socket @%s\n", SOCKET_FILE);
 		daemon->is_alive = true;
 		g_shell->daemon = daemon;

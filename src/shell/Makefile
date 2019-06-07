@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/05/31 17:15:27 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/06/07 17:41:03 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -72,8 +72,10 @@ BUILTIN_DIR = builtins/
 BUILTIN_SRC = builtins.c \
               hs_history.c \
               tokenizer_test.c \
-              network_connect.c daemon_status.c \
-              daemon_stop.c
+              tm_connect.c \
+              tm_echo.c \
+              tm_status.c \
+              tm_stop.c
 
 INTERFACE_DIR = line_editing/
 INTERFACE_SRC = buffer_drawing.c buffer_input.c  \

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:22 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/04 15:56:33 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/07 16:16:28 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,18 @@
 # include "ft_printf.h"
 # include "shell_environ.h"
 
+enum					e_builtin_class
+{
+	BUILTIN_SHELL,
+	BUILTIN_REMOTE
+};
+
 struct					s_builtin
 {
-	char	*name;
-	int		(*function) (const char **);
+	char					*name;
+	int						(*function) (const char **);
+	int						(*help) (void);
+	enum e_builtin_class	clazz;
 };
 
 void					print_var(const t_var *var);
@@ -39,6 +47,8 @@ int						hs_history(const char **args);
 int						hs_tokenizer(const char **args);
 
 int						tm_status(const char **args);
+int						tm_status_help(void);
+
 int						tm_stop(const char **args);
 
 #endif

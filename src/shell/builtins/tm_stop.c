@@ -46,6 +46,7 @@ int						tm_stop(const char **args)
 			dprintf(2, SH ": failed to send request: %s\n", strerror(errno));
 		else
 		{
+			queue = NULL;
 			dprintf(2, SH ": seems like sent all, now waiting for response\n");
 			if (net_get(g_shell->daemon->socket_fd, &queue) >= 0)
 				status = packet_resolve_all(queue);

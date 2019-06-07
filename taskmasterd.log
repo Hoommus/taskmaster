@@ -131258,3 +131258,68 @@ DEBUG  [07.06.2019 17:10:05.3492] Signals handled
 DEBUG  [07.06.2019 17:10:05.3493] Fork for 0 job, 0 process
 DEBUG  [07.06.2019 17:10:05.3501] redirections successed!
 
+INFO   [07.06.2019 17:42:27.8049] logger for ./taskmasterd [5080] started
+DEBUG  [07.06.2019 17:42:27.8054] Initialising daemon
+DEBUG  [07.06.2019 17:42:27.8058] Successfully forked first time
+DEBUG  [07.06.2019 17:42:27.8080] Closed all redundant fds
+DEBUG  [07.06.2019 17:42:27.8083] Set sigprocmask, sid and umask(0)
+DEBUG  [07.06.2019 17:42:27.8087] Successfully forked second time, now we're real daemon
+DEBUG  [07.06.2019 17:42:27.8090] Replaced all standard fds with /dev/null
+DEBUG  [07.06.2019 17:42:27.8092] Thread pool initialized
+DEBUG  [07.06.2019 17:42:27.8093] Creating sockets
+DEBUG  [07.06.2019 17:42:27.8096] Successfully created socket at /var/tmp/taskmasterd.socket (fd: 4)
+INFO   [07.06.2019 17:42:27.8099] Successfully started listening to a local socket
+DEBUG  [07.06.2019 17:42:27.8100] Locking a tpool mutex
+DEBUG  [07.06.2019 17:42:27.8102] Found not busy thread, assigning id
+DEBUG  [07.06.2019 17:42:27.8104] pthread created successfully, assigning args
+DEBUG  [07.06.2019 17:42:27.8106] marking thread busy
+DEBUG  [07.06.2019 17:42:27.8108] incrementing number of running threads
+DEBUG  [07.06.2019 17:42:27.8109] unlocking a tpool mutex
+DEBUG  [07.06.2019 17:42:27.8113] Started thread for 4 socket
+DEBUG  [07.06.2019 17:42:27.8115] Signals handled
+
+DEBUG  [07.06.2019 17:42:27.8117] Fork for 0 job, 0 process
+DEBUG  [07.06.2019 17:42:27.8123] redirections successed!
+
+INFO   [07.06.2019 17:42:31.3850] Connected new local client
+DEBUG  [07.06.2019 17:42:31.3854] Locking a tpool mutex
+DEBUG  [07.06.2019 17:42:31.3857] Found not busy thread, assigning id
+DEBUG  [07.06.2019 17:42:31.3860] pthread created successfully, assigning args
+DEBUG  [07.06.2019 17:42:31.3861] marking thread busy
+DEBUG  [07.06.2019 17:42:31.3863] incrementing number of running threads
+DEBUG  [07.06.2019 17:42:31.3865] unlocking a tpool mutex
+INFO   [07.06.2019 17:42:31.3867] Started listening packets
+INFO   [07.06.2019 17:42:32.7291] Received some packets, resolving requests
+DEBUG  [07.06.2019 17:42:32.7293] Reporting status to a client, packet: 0x7fa38f600290
+INFO   [07.06.2019 17:42:32.7295] Successfully reported status to client
+INFO   [07.06.2019 17:42:35.6331] Received some packets, resolving requests
+INFO   [07.06.2019 17:42:35.6333] Client requested all job stop
+INFO   [07.06.2019 17:42:35.6335] Successfully reported status to client
+INFO   [07.06.2019 17:42:35.6338] Client dropped connection
+DEBUG  [07.06.2019 17:42:35.6341] Finalising 1 thread
+INFO   [07.06.2019 17:42:40.0168] Connected new local client
+DEBUG  [07.06.2019 17:42:40.0171] Locking a tpool mutex
+DEBUG  [07.06.2019 17:42:40.0172] Found not busy thread, assigning id
+DEBUG  [07.06.2019 17:42:40.0174] pthread created successfully, assigning args
+DEBUG  [07.06.2019 17:42:40.0176] marking thread busy
+DEBUG  [07.06.2019 17:42:40.0177] incrementing number of running threads
+DEBUG  [07.06.2019 17:42:40.0179] unlocking a tpool mutex
+INFO   [07.06.2019 17:42:40.0181] Started listening packets
+INFO   [07.06.2019 17:42:52.5372] Received some packets, resolving requests
+INFO   [07.06.2019 17:42:52.5374] Client requested all job stop
+INFO   [07.06.2019 17:42:52.5375] Successfully reported status to client
+INFO   [07.06.2019 17:43:37.1523] Client dropped connection
+DEBUG  [07.06.2019 17:43:37.1526] Finalising 1 thread
+INFO   [07.06.2019 17:43:41.3209] Connected new local client
+DEBUG  [07.06.2019 17:43:41.3212] Locking a tpool mutex
+DEBUG  [07.06.2019 17:43:41.3215] Found not busy thread, assigning id
+DEBUG  [07.06.2019 17:43:41.3217] pthread created successfully, assigning args
+DEBUG  [07.06.2019 17:43:41.3219] marking thread busy
+DEBUG  [07.06.2019 17:43:41.3221] incrementing number of running threads
+DEBUG  [07.06.2019 17:43:41.3223] unlocking a tpool mutex
+INFO   [07.06.2019 17:43:41.3225] Started listening packets
+INFO   [07.06.2019 17:43:42.2091] Received some packets, resolving requests
+INFO   [07.06.2019 17:43:42.2094] Client requested all job stop
+INFO   [07.06.2019 17:43:42.2095] Successfully reported status to client
+INFO   [07.06.2019 17:43:45.3847] Client dropped connection
+DEBUG  [07.06.2019 17:43:45.3851] Finalising 1 thread

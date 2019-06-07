@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/28 11:45:45 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/07 11:33:48 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/07 12:26:29 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,7 @@ int			net_send(int socket, struct s_packet *packet)
 	const char		*copy;
 	ssize_t			last_write;
 	ssize_t			packet_left;
-	struct timeval	timeout;
 
-	timeout.tv_sec = 5;
-	timeout.tv_usec = 0;
 	copy = json_object_to_json_string(packet->json_content);
 	packet_left = strlen(copy);
 	while ((last_write = write(socket, copy, packet_left)) != packet_left)
