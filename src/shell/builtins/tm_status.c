@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/24 12:34:01 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/07 11:44:43 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/07 15:50:32 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,12 @@ int			parse_response_status(const struct s_packet *packet)
 	return (status);
 }
 
+int			tm_status_help(void)
+{
+	return (printf("status:\nrequests data about jobs from the daemon "
+				"and prints it nicely\n"));
+}
+
 int			tm_status(const char **args)
 {
 	struct s_packet	*request;
@@ -65,7 +71,6 @@ int			tm_status(const char **args)
 	char			*response;
 	int				status;
 
-	status = -1;
 	response = NULL;
 	if (args && args[0] && strcmp(args[0], "--help") == 0)
 		printf("Usage goes here\n");
@@ -74,14 +79,19 @@ int			tm_status(const char **args)
 	else
 	{
 		request = pack_to_packet(REQUEST_STATUS, args);
-		if (net_send(g_shell->daemon->socket_fd, request) != 0)
+		errno = 0;
+		if ((status = net_send(g_shell->daemon->socket_fd, request)) < 0)
 			dprintf(2, SH ": failed to send request: %s\n",
 				errno == EPIPE ? "server dropped connection" : strerror(errno));
+		else if (status == 0 && errno != 0)
+			dprintf(2, SH ": request timed out");
 		else
 		{
 			queue = NULL;
 			if (net_get(g_shell->daemon->socket_fd, &queue) >= 0)
 				status = packet_resolve_all(queue);
+			else
+				dprintf(2, SH ": response timed out");
 		}
 		free((void *)response);
 		packet_free(&request);

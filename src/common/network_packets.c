@@ -48,6 +48,7 @@ struct s_packet	*packet_create_json(json_object *content,
 	packet = calloc(1, sizeof(struct s_packet));
 	if (packet == NULL)
 		return (NULL);
+	packet->content = NULL;
 	packet->timestamp = timestamp;
 	packet->json_content = content;
 	packet->is_content_parsed = true;
