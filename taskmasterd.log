@@ -131235,3 +131235,26 @@ DEBUG  [06.06.2019 21:43:57.8932] redirections successed!
 DEBUG  [06.06.2019 21:44:07.4678] SIGCHLD yep
 DEBUG  [06.06.2019 21:44:07.4682] FATAL 0 job, 0 process (/bin/bash)
 DEBUG  [06.06.2019 21:44:07.4692] SIG yep
+INFO   [07.06.2019 17:10:05.3274] logger for ./taskmasterd [80999] started
+DEBUG  [07.06.2019 17:10:05.3409] Initialising daemon
+DEBUG  [07.06.2019 17:10:05.3414] Successfully forked first time
+DEBUG  [07.06.2019 17:10:05.3450] Closed all redundant fds
+DEBUG  [07.06.2019 17:10:05.3452] Set sigprocmask, sid and umask(0)
+DEBUG  [07.06.2019 17:10:05.3462] Successfully forked second time, now we're real daemon
+DEBUG  [07.06.2019 17:10:05.3465] Replaced all standard fds with /dev/null
+DEBUG  [07.06.2019 17:10:05.3466] Thread pool initialized
+DEBUG  [07.06.2019 17:10:05.3469] Creating sockets
+DEBUG  [07.06.2019 17:10:05.3473] Successfully created socket at /var/tmp/taskmasterd.socket (fd: 4)
+INFO   [07.06.2019 17:10:05.3476] Successfully started listening to a local socket
+DEBUG  [07.06.2019 17:10:05.3478] Locking a tpool mutex
+DEBUG  [07.06.2019 17:10:05.3480] Found not busy thread, assigning id
+DEBUG  [07.06.2019 17:10:05.3482] pthread created successfully, assigning args
+DEBUG  [07.06.2019 17:10:05.3484] Started thread for 4 socket
+DEBUG  [07.06.2019 17:10:05.3487] marking thread busy
+DEBUG  [07.06.2019 17:10:05.3489] incrementing number of running threads
+DEBUG  [07.06.2019 17:10:05.3490] unlocking a tpool mutex
+DEBUG  [07.06.2019 17:10:05.3492] Signals handled
+
+DEBUG  [07.06.2019 17:10:05.3493] Fork for 0 job, 0 process
+DEBUG  [07.06.2019 17:10:05.3501] redirections successed!
+

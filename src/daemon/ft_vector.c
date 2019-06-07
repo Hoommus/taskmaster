@@ -6,7 +6,7 @@
 /*   By: obamzuro <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/09 17:09:11 by obamzuro          #+#    #+#             */
-/*   Updated: 2019/05/23 21:36:32 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/07 17:09:30 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void		init_ftvector(t_ftvector *vec)
 
 void		free_ftvector(t_ftvector *vec)
 {
-	int		i;
+	unsigned int		i;
 
 	i = -1;
 	while (++i < vec->len)
@@ -36,7 +36,7 @@ void		push_ftvector(t_ftvector *vec,
 		void *line)
 {
 	void	**temp;
-	int		i;
+	unsigned int		i;
 
 	if (!vec || !line)
 		return ;

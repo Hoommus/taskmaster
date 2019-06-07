@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:13:30 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/06 21:38:44 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/07 17:09:59 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,7 @@ typedef enum	e_policyType
 typedef struct	s_ftvector
 {
 	void			**elem;
-	int				capacity;
+	unsigned int	capacity;
 	unsigned int	len;
 }				t_ftvector;
 

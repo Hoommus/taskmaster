@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/23 17:58:26 by obamzuro          #+#    #+#             */
-/*   Updated: 2019/06/06 22:09:26 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/07 17:08:50 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,13 +218,13 @@ void		d_start(const int job_num, const int process_num)
 
 	current_job = (t_job *)g_jobs->elem[job_num];
 	current_process = &current_job->processes[process_num];
-	log_fwrite(LOG_DEBUG, "Fork for %d job, %d process", job_num, process_num);
+	log_fwrite(TLOG_DEBUG, "Fork for %d job, %d process", job_num, process_num);
 	// TODO: handle overflow time limit
 	current_process->time_begin = time(NULL);
 	current_process->state = STARTING;
 	process = fork();
 	if (process == -1)
-		log_fwrite(LOG_ERROR, "Failed to fork %d job, %d process", job_num, process_num);
+		log_fwrite(TLOG_ERROR, "Failed to fork %d job, %d process", job_num, process_num);
 	else if (process == 0)
 	{
 		// TODO one create_new_env for job
@@ -233,14 +233,14 @@ void		d_start(const int job_num, const int process_num)
 		umask(current_job->umask);
 		if (handle_redirections(current_job) == -1)
 		{
-			log_fwrite(LOG_DEBUG, "redirections failed!\n%s\n", strerror(errno));
+			log_fwrite(TLOG_DEBUG, "redirections failed!\n%s\n", strerror(errno));
 			exit(228);
 		}
 		else
-			log_fwrite(LOG_DEBUG, "redirections successed!\n");
+			log_fwrite(TLOG_DEBUG, "redirections successed!\n");
 		if (execve(current_job->args[0], current_job->args, envp) == -1)
 		{
-			log_fwrite(LOG_DEBUG, "exec failed!\n%s\n", strerror(errno));
+			log_fwrite(TLOG_DEBUG, "exec failed!\n%s\n", strerror(errno));
 			exit(228);
 		}
 	}
@@ -267,16 +267,16 @@ void		d_restart()
 			current_process = &current_job->processes[process_num];
 			if (current_process->state == EXITED)
 			{
-				log_fwrite(LOG_DEBUG, "RESTART %d job, %d process (%s) after exit",
+				log_fwrite(TLOG_DEBUG, "RESTART %d job, %d process (%s) after exit",
 						job_num, process_num, current_job->args[0]);
 				d_start(job_num, process_num);
 			}
 			else if (current_process->state == FATAL)
-				log_fwrite(LOG_DEBUG, "FATAL %d job, %d process (%s)",
+				log_fwrite(TLOG_DEBUG, "FATAL %d job, %d process (%s)",
 						job_num, process_num, current_job->args[0]);
 			else if (current_process->state == BACKOFF)
 			{
-				log_fwrite(LOG_DEBUG, "RESTART %d job, %d process (%s) after unsuccessfull run",
+				log_fwrite(TLOG_DEBUG, "RESTART %d job, %d process (%s) after unsuccessfull run",
 						job_num, process_num, current_job->args[0]);
 				d_start(job_num, process_num);
 			}
@@ -363,7 +363,7 @@ void		signal_attempting()
 	act.sa_flags |= SA_NODEFER;// | SA_SIGINFO;
 	if (sigaction(SIGALRM, &act, NULL) < 0)
 		exit (123);
-	log_write(LOG_DEBUG, "Signals handled\n");
+	log_write(TLOG_DEBUG, "Signals handled\n");
 }
 
 void		process_handling()
