@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/23 17:58:26 by obamzuro          #+#    #+#             */
-/*   Updated: 2019/06/04 16:48:46 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/06 22:09:26 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 char		*argsHardcoded[] =
 {
 	"/bin/bash", "src/daemon/echoer.sh", NULL
+//	"/usr/bin/base64", "/dev/urandom", NULL
 };
 
 int8_t		expected_statuses[] =
@@ -61,9 +62,14 @@ int			jobs_filler()
 	t_job	*hardjob;
 
 	hardjob = (t_job *)malloc(sizeof(t_job));
-	hardjob->pid = 0;
-	hardjob->state = STARTING;
-//	hardjob->processes = NULL;
+	hardjob->processes = (t_process *)malloc(1 * sizeof(t_process));
+	hardjob->processes_length = 1;
+	// ???? really need?
+	hardjob->processes[0].pid = 0;
+	hardjob->processes[0].state = STARTING;
+	// TODO copy copy copy?
+	hardjob->processes[0].restart_attempts = 1;
+	// ????
 	hardjob->args = argsHardcoded;
 	hardjob->policy = POLICY_RESTART_ALWAYS | POLICY_START_ON_LAUNCH;
 	hardjob->program_duplicates = 0;
@@ -77,13 +83,11 @@ int			jobs_filler()
 	hardjob->working_dir = "./";
 	hardjob->umask = 0;
 	hardjob->in = NULL;
-	hardjob->out = "./1234";
-	hardjob->err = NULL;
+	hardjob->out = "./1234"; hardjob->err = NULL;
 
 	hardjob->origin = ORIGIN_CONFIG;
 	init_ftvector(g_jobs);
 	push_ftvector(g_jobs, hardjob);
-	dprintf(g_master->logfile, "Filler for %d job\n", 0);
 	return (0);
 }
 
@@ -115,213 +119,267 @@ int			handle_redirections(t_job *job)
 	return (0);
 }
 
-void		sigchld_handler(int signo __attribute__((unused)))
+void		sigchld_handler_process_handle(	int statloc,
+											time_t *current_time,
+											t_job *current_job,
+											t_process *current_process)
+{
+	// if process is successfully started it's state will be
+	// STARTING for time while it doesn't receive SIGCHLD sig
+	// and change to EXITED -> RUNNING
+	if (current_process->state == STOPPED)
+		return ;
+	else if (current_process->state == STARTING &&
+			*current_time - current_process->time_begin <
+			current_job->successful_start_timeout)
+	{
+		if (current_process->restart_attempts)
+		{
+			current_process->state = BACKOFF;
+			--current_process->restart_attempts;
+		}
+		else
+			current_process->state = FATAL;
+	}
+	else if (current_process->state | RUNNING | STARTING &&
+			(current_job->policy & POLICY_RESTART_ALWAYS ||
+		(current_job->policy & POLICY_RESTART_UNEXPECTED
+		 && statloc == current_job->expected_statuses)))
+	{
+		//dprintf(g_master->sockets[0]->fd, "%ld", current_time - job->time_begin);
+		current_process->state = EXITED;
+	}
+}
+
+void		sigchld_handler_find_process(	int statloc,
+											time_t *current_time,
+											pid_t *pid)
+{
+	unsigned int	job_num;
+	unsigned int	process_num;
+	t_job			*current_job;
+	t_process		*current_process;
+
+	job_num = -1;
+	while (++job_num < g_jobs->len)
+	{
+		current_job = (t_job *)g_jobs->elem[job_num];
+		process_num = -1;
+		while (++process_num < current_job->processes_length)
+		{
+			current_process = &current_job->processes[process_num];
+			if (current_process->pid == *pid)
+			{
+				sigchld_handler_process_handle(statloc, current_time,
+						current_job, current_process);
+				break ;
+			}
+		}
+	}
+}
+
+void		sigchld_handler(void)
 {
 	pid_t	pid;
 	int		statloc;
-	int		i;
-	t_job	*job;
 	time_t	current_time;
 
 	statloc = 0;
 	pid = wait(&statloc);
-	current_time = time(NULL);
-	// SET_FL - TODO
 	if (WIFEXITED(statloc) && WEXITSTATUS(statloc) == 228)
 		return ;
-	i = 0;
-	while (i < g_jobs->len)
-	{
-		job = (t_job *)g_jobs->elem[i];
-		if (job->pid == pid)
-		{
-			// if process is successfully started it's state will be
-			// STARTING for time while it doesn't receive SIGCHLD sig
-			// and change to EXITED -> RUNNING
-			if (job->state == STOPPED)
-				return ;
-			else if (job->state == STARTING &&
-					current_time - job->time_begin < job->successful_start_timeout)
-			{
-				if (job->restart_attempts)
-				{
-					job->state = BACKOFF;
-					--job->restart_attempts;
-				}
-				else
-					job->state = FATAL;
-			}
-			else if (job->state | RUNNING | STARTING &&
-					(job->policy & POLICY_RESTART_ALWAYS ||
-				(job->policy & POLICY_RESTART_UNEXPECTED
-				 && statloc == job->expected_statuses)))
-			{
-				//dprintf(g_master->sockets[0]->fd, "%ld", current_time - job->time_begin);
-				job->state = EXITED;
-			}
-			break ;
-		}
-		++i;
-	}
-//	if (fcntl(g_master->local->fd, F_SETFL, O_NONBLOCK) < 0)
-//		// nah printf - bad func
-//		dprintf(g_master->logfile, "NAH\n");
+	current_time = time(NULL);
+	sigchld_handler_find_process(statloc, &current_time, &pid);
 }
 
-void		d_stop(int iter)
+void		d_stop(const unsigned int job_num, const unsigned int process_num)
 {
-	t_job			*job;
+	t_job			*current_job;
+	t_process		*current_process;
 	unsigned int	ret;
 
 	//TODO block sigalarm
-	job = (t_job *)g_jobs->elem[iter];
-	job->state = STOPPING;
-	time(&job->time_stop);
-	ret = alarm(job->graceful_stop_timeout);
-	if (ret && ret < job->graceful_stop_timeout)
-		alarm(job->graceful_stop_timeout);
+	current_job = (t_job *)g_jobs->elem[job_num];
+	current_process = &current_job->processes[process_num];
+	current_process->state = STOPPING;
+	time(&current_process->time_stop);
+	ret = alarm(current_job->graceful_stop_timeout);
+	if (ret && ret < current_job->graceful_stop_timeout)
+		alarm(current_job->graceful_stop_timeout);
 }
 
-void		d_start(int iter)
+void		d_start(const int job_num, const int process_num)
 {
 	pid_t		process;
 	char		**envp;
-	t_job		*currentjob;
+	t_job		*current_job;
+	t_process	*current_process;
 //	struct tms	process_time;
 
-	currentjob = (t_job *)g_jobs->elem[iter];
-	dprintf(g_master->logfile, "Fork for %d job\n", iter);
+	current_job = (t_job *)g_jobs->elem[job_num];
+	current_process = &current_job->processes[process_num];
+	log_fwrite(LOG_DEBUG, "Fork for %d job, %d process", job_num, process_num);
 	// TODO: handle overflow time limit
-	currentjob->time_begin = time(NULL);
-	currentjob->state = STARTING;
+	current_process->time_begin = time(NULL);
+	current_process->state = STARTING;
 	process = fork();
 	if (process == -1)
-		dprintf(g_master->logfile, "Failed to fork %d job\n", iter);
+		log_fwrite(LOG_ERROR, "Failed to fork %d job, %d process", job_num, process_num);
 	else if (process == 0)
 	{
-		envp = create_new_env(currentjob);
-		chdir(currentjob->working_dir);
-		umask(currentjob->umask);
-		if (handle_redirections(currentjob) == -1)
+		// TODO one create_new_env for job
+		envp = create_new_env(current_job);
+		chdir(current_job->working_dir);
+		umask(current_job->umask);
+		if (handle_redirections(current_job) == -1)
 		{
-			dprintf(g_master->logfile, "redirections failed!\n%s\n", strerror(errno));
+			log_fwrite(LOG_DEBUG, "redirections failed!\n%s\n", strerror(errno));
 			exit(228);
 		}
 		else
-			dprintf(g_master->logfile, "redirections successed!\n");
-		if (execve(currentjob->args[0], currentjob->args, envp) == -1)
+			log_fwrite(LOG_DEBUG, "redirections successed!\n");
+		if (execve(current_job->args[0], current_job->args, envp) == -1)
 		{
-			dprintf(g_master->logfile, "exec failed!\n%s\n", strerror(errno));
+			log_fwrite(LOG_DEBUG, "exec failed!\n%s\n", strerror(errno));
 			exit(228);
 		}
 	}
 	else
 	{
-		currentjob->pid = process;
+		current_process->pid = process;
 	}
-
 }
 
 void		d_restart()
 {
-	int		i;
-	t_job	*job;
-	// TODO: these sigset_t differ on Linux, so you should use sigaddset() functions
-	//  to manipulate the mask. At the moment, this code won't compile on Linux
+	unsigned int	job_num;
+	unsigned int	process_num;
+	t_job			*current_job;
+	t_process		*current_process;
 
-	i = 0;
-//	sigemptyset(&sigset);
-//	sigset |= SIGCHLD;
-//	sigprocmask(SIG_BLOCK, &sigset, &osigset);
-	//TODO check return
-//	val = fcntl(g_master->local->fd, F_GETFL, 0);
-//	val &= ~O_NONBLOCK;
-//	ret = fcntl(g_master->local->fd, F_SETFL, val);
-	while (i < g_jobs->len)
+	job_num = -1;
+	while (++job_num < g_jobs->len)
 	{
-		job = (t_job *)g_jobs->elem[i];
-		if (job->state == EXITED)
+		current_job = (t_job *)g_jobs->elem[job_num];
+		process_num = -1;
+		while (++process_num < current_job->processes_length)
 		{
-			dprintf(g_master->logfile, "RESTART %d job(%s) after exit\n", i, job->args[0]);
-			d_start(i);
+			current_process = &current_job->processes[process_num];
+			if (current_process->state == EXITED)
+			{
+				log_fwrite(LOG_DEBUG, "RESTART %d job, %d process (%s) after exit",
+						job_num, process_num, current_job->args[0]);
+				d_start(job_num, process_num);
+			}
+			else if (current_process->state == FATAL)
+				log_fwrite(LOG_DEBUG, "FATAL %d job, %d process (%s)",
+						job_num, process_num, current_job->args[0]);
+			else if (current_process->state == BACKOFF)
+			{
+				log_fwrite(LOG_DEBUG, "RESTART %d job, %d process (%s) after unsuccessfull run",
+						job_num, process_num, current_job->args[0]);
+				d_start(job_num, process_num);
+			}
 		}
-		else if (job->state == FATAL)
-			dprintf(g_master->logfile, "FATAL %d job(%s)\n", i, job->args[0]);
-		else if (job->state == BACKOFF)
-		{
-			dprintf(g_master->logfile, "RESTART %d job(%s) after unsuccessfull run\n", i, job->args[0]);
-			d_start(i);
-		}
-		++i;
 	}
-//	sigprocmask(SIG_SETMASK, &osigset, NULL);
+}
+
+int			alrm_handler_stopper(		t_job *current_job,
+										t_process *current_process,
+										time_t now,
+										int *mindif)
+{
+	int		dif;
+
+	if (current_process->state == STOPPING)
+	{
+		dif = current_job->graceful_stop_timeout - (now - current_process->time_stop);
+		if (dif > 0 && *mindif > dif)
+			*mindif = dif;
+		if (dif <= 0)
+		{
+			current_process->state = STOPPED;
+			kill(current_process->pid, SIGKILL);
+		}
+	}
+	return (*mindif);
+}
+
+void		alrm_handler_inner(time_t now, int mindif)
+{
+	unsigned int	job_num;
+	unsigned int	process_num;
+	t_job			*current_job;
+	t_process		*current_process;
+
+	job_num = -1;
+	while (++job_num < g_jobs->len)
+	{
+		current_job = (t_job *)g_jobs->elem[job_num];
+		process_num = -1;
+		while (++process_num < current_job->processes_length)
+		{
+			current_process = &current_job->processes[process_num];
+			mindif = alrm_handler_stopper(current_job, current_process, now, &mindif);
+		}
+	}
+	if (mindif != INT_MAX)
+		alarm(mindif);
+
 }
 
 void		alrm_handler(int signo __attribute__((unused)))
 {
-	int		i;
-	t_job	*job;
 	time_t	now;
 	int		mindif;
-	int		dif;
 
-	i = 0;
 	time(&now);
 	mindif = INT_MAX;
-	while (i < g_jobs->len)
-	{
-		job = (t_job *)g_jobs->elem[i];
-		if (job->state == STOPPING)
-		{
-			dif = job->graceful_stop_timeout - (now - job->time_stop);
-			if (dif > 0 && mindif > dif)
-				mindif = dif;
-			if (dif <= 0)
-			{
-				job->state = STOPPED;
-				kill(job->pid, SIGKILL);
-			}
-		}
-		++i;
-	}
-	if (mindif != INT_MAX)
-		alarm(mindif);
+	alrm_handler_inner(now, mindif);
 }
+
+void		sigchld_wrapper(int signo __attribute__((unused))) {}
 
 void		signal_attempting()
 {
-//	struct sigaction	act;
+	struct sigaction	act;
 //
+	act.sa_handler = NULL;
+	act.sa_handler = sigchld_wrapper;//igchld_handler;
+	sigemptyset(&act.sa_mask);
+	act.sa_flags = 0;
+#ifdef SA_INTERRUPT
+	act.sa_flags |= SA_INTERRUPT;
+#endif
+	if (sigaction(SIGCHLD, &act, NULL) < 0)
+		exit(123);
+	act.sa_handler = alrm_handler;
 //	act.sa_handler = NULL;
-//	act.sa_sigaction = sigchld_handler;
-//	sigemptyset(&act.sa_mask);
-//	act.sa_flags = 0;
-//#ifdef SA_INTERRUPT
-//	act.sa_flags |= SA_INTERRUPT;
-//#endif
-//	if (sigaction(SIGCHLD, &act, NULL) < 0)
-//		exit(123);
-//	act.sa_handler = alrm_handler;
-////	act.sa_handler = NULL;
-//	act.sa_sigaction = NULL;
-//	sigemptyset(&act.sa_mask);
-//	// hz
-//	sigaddset(&act.sa_mask, SIGCHLD);
-//	act.sa_flags = 0;
-//	act.sa_flags |= SA_NODEFER;// | SA_SIGINFO;
-//	if (sigaction(SIGALRM, &act, NULL) < 0)
-//		exit (123);
-//	dprintf(g_master->logfile, "Signals handled\n");
+	act.sa_sigaction = NULL;
+	sigemptyset(&act.sa_mask);
+	// hz
+	sigaddset(&act.sa_mask, SIGCHLD);
+	act.sa_flags = 0;
+	act.sa_flags |= SA_NODEFER;// | SA_SIGINFO;
+	if (sigaction(SIGALRM, &act, NULL) < 0)
+		exit (123);
+	log_write(LOG_DEBUG, "Signals handled\n");
 }
 
 void		process_handling()
 {
-	int			i;
+	unsigned int	job_num;
+	unsigned int	process_num;
+	t_job			*current_job;
 
 	jobs_filler();
-//	signal_attempting();
-	i = -1;
-	while (++i < g_jobs->len)
-		d_start(i);
-	dprintf(g_master->logfile, "process handled\n");
+	signal_attempting();
+	job_num = -1;
+	while (++job_num < g_jobs->len)
+	{
+		current_job = (t_job *)g_jobs->elem[job_num];
+		process_num = -1;
+		while (++process_num < current_job->processes_length)
+			d_start(job_num, process_num);
+	}
 }

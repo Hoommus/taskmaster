@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:10:31 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/06 14:08:43 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/06 22:14:06 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ int		create_sockets(void)
 
 pid_t	create_daemon(void)
 {
-//	struct rlimit	limits;
+	struct rlimit	limits;
 	const sigset_t	mask = {0};
 	pid_t			pid;
 	int32_t			null;
@@ -50,12 +50,17 @@ pid_t	create_daemon(void)
 		exit(EXIT_SUCCESS);
 	log_write(TLOG_DEBUG, "Successfully forked first time");
 	i = 2;
+	if (getrlimit(RLIMIT_NOFILE, &limits) == 0)
+		while (++i < limits.rlim_cur)
+			if ((int)i != fileno(logger_get_file()))
+				close(i);
+	log_write(TLOG_DEBUG, "Closed all redundant fds");
+	sigprocmask(SIG_SETMASK, &mask, NULL);
 //	if (getrlimit(RLIMIT_NOFILE, &limits) == 0)
 //		while (++i < limits.rlim_cur)
 //			if ((int)i != fileno(logger_get_file()))
 //				close(i);
-	log_write(TLOG_DEBUG, "Closed all redundant fds");
-	sigprocmask(SIG_SETMASK, &mask, NULL);
+//	log_write(TLOG_DEBUG, "Closed all redundant fds");
 	setsid();
 	umask(0);
 	log_write(TLOG_DEBUG, "Set sigprocmask, sid and umask(0)");
@@ -155,6 +160,8 @@ int					main(int argc, char **argv)
 	sigset_t			sigset;
 	sigset_t			osigset;
 	struct s_args		args;
+	int					err;
+	int					signo;
 
 	remove(SOCKET_FILE);
 	args = parse_args(argc - 1, argv + 1);
@@ -168,6 +175,13 @@ int					main(int argc, char **argv)
 	create_daemon();
 	tpool_init();
 	log_write(TLOG_DEBUG, "Creating sockets");
+
+	sigemptyset(&sigset);
+	sigaddset(&sigset, SIGCHLD);
+	sigaddset(&sigset, SIGINT);
+	if ((err = pthread_sigmask(SIG_BLOCK, &sigset, &osigset)))
+		log_write(TLOG_ERROR, "PTHREAD_SIGMASK error\n");
+
 	if (create_sockets() == -1)
 		log_write(TLOG_ERROR, "Failed to create some sockets");
 	else
@@ -175,26 +189,18 @@ int					main(int argc, char **argv)
 
 	g_jobs = (t_ftvector *)malloc(sizeof(t_ftvector));
 
-	sigemptyset(&sigset);
-	sigset |= SIGCHLD;
-	sigprocmask(SIG_BLOCK, &sigset, &osigset);
 	process_handling();
-//	sigprocmask(SIG_SETMASK, &osigset, NULL);
 	atexit(destructor);
 	while (ponies_teleported())
 	{
-		if (sigsuspend(&osigset) != -1)
-			log_write(TLOG_ERROR, "SIGSUSPEND error\n");
-		d_restart();
-//		pause();
-//		if (errno == EAGAIN)
-//		{
-//			log_write(TLOG_ERROR, "EAGAIN connection\n%s\n", strerror(errno));
-//		}
-//		else if (errno == EINTR)
-//			log_write(TLOG_ERROR, "EINTR connection\n%s\n", strerror(errno));
-//		else
-//			log_write(TLOG_ERROR, "Connection acceptance failed\n%s\n", strerror(errno));
+		if ((err = sigwait(&sigset, &signo)))
+			log_write(TLOG_ERROR, "SIGWAIT error");
+		if (signo == SIGCHLD)
+		{
+			log_write(TLOG_DEBUG, "SIGCHLD received");
+			sigchld_handler();
+			d_restart();
+		}
 	}
 	return (0);
 }
