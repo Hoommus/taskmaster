@@ -1,35 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   serve_stop.c                                       :+:      :+:    :+:   */
+/*   serve_handshake.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/06/06 17:45:55 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/06 18:38:37 by vtarasiu         ###   ########.fr       */
+/*   Created: 2019/06/08 13:31:46 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/06/08 19:27:43 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "taskmaster_daemon.h"
 
-int							serve_stop(const struct s_packet *packet)
+int							serve_handshake(const struct s_packet *packet)
 {
 	struct s_packet	*response;
 	json_object		*root;
-	const char		*job_name;
 
-	job_name = json_object_get_string(json_object_object_get(packet->json_content, "job_name"));
-	log_fwrite(TLOG_INFO, "Client requested %s job stop", job_name);
-
-	// TODO: d_stop
-
+	log_write(TLOG_DEBUG, "Received handshake request");
 	root = json_object_new_object();
-	json_object_object_add(root, "success", json_object_new_int(1));
+	json_object_object_add(root, "handshake", json_object_new_string("Nice to meet you too."));
 	response = packet_create_json(root, packet->request, NULL);
 	if (net_send(packet->respond_to, response) == -1)
-		log_fwrite(TLOG_WARN, "Status reporting failed: %s", strerror(errno));
+		log_fwrite(TLOG_WARN, "Failed to answer to a handshake request: %s", strerror(errno));
 	else
-		log_write(TLOG_INFO, "Successfully reported status to client");
+		log_write(TLOG_DEBUG, "Successfully responded to a handshake");
 	packet_free(&response);
-	return (packet == NULL);
+	return (0);
 }

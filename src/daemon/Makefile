@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/05/20 12:51:40 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/06/07 10:49:16 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/06/08 15:11:40 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -55,7 +55,7 @@ NETWORK_DIR = network/
 NETWORK_SRC = sockets_manipulations.c client_interactions.c thread_pool.c \
               serve_invalid.c \
               serve_status.c \
-              serve_heartbeat.c \
+              serve_handshake.c \
               serve_stop.c
 
 OBJ = $(addprefix $(OBJ_DIR), $(DAEMON_SRC:.c=.o))                        \

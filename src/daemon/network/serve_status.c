@@ -12,12 +12,11 @@
 
 #include "taskmaster_daemon.h"
 
-int							respond_status(const struct s_packet *packet)
+int							serve_status(const struct s_packet *packet)
 {
 	struct s_packet	*response;
 	json_object		*root;
 	json_object		*array;
-	struct timeval	time;
 
 	log_fwrite(TLOG_DEBUG, "Reporting status to a client, packet: %p", packet);
 	if (packet == NULL)
@@ -28,8 +27,7 @@ int							respond_status(const struct s_packet *packet)
 	root = json_object_new_object();
 	array = json_object_new_array();
 	json_object_object_add(root, "jobs", (array));
-	gettimeofday(&time, NULL);
-	response = packet_create_json(root, packet->request, time);
+	response = packet_create_json(root, packet->request, NULL);
 	if (net_send(packet->respond_to, response) == -1)
 		log_fwrite(TLOG_WARN, "Status reporting failed: %s", strerror(errno));
 	packet_free(&response);

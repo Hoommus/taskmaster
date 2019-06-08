@@ -6,16 +6,17 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/29 18:37:19 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/06 18:47:03 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/08 15:06:22 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "taskmaster_daemon.h"
 
 struct s_resolver			g_resolvers[] = {
-	{REQUEST_STATUS, &respond_status},
-	{REQUEST_STOP, &respond_stop},
-	{2147483647, &respond_invalid},
+	{REQUEST_STATUS, &serve_status},
+	{REQUEST_STOP, &serve_stop},
+	{REQUEST_HANDSHAKE, &serve_handshake},
+	{2147483647, &serve_invalid},
 	{0, NULL}
 };
 

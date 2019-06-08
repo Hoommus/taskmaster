@@ -1,19 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   heartbeat.c                                        :+:      :+:    :+:   */
+/*   auxiliary.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/06/06 12:08:11 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/06 12:08:14 by vtarasiu         ###   ########.fr       */
+/*   Created: 2019/06/07 18:34:55 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/06/07 18:39:57 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "taskmaster_common.h"
+#include "taskmaster_cli.h"
 
-int			send_heartbeat(struct s_packet *packet)
+int			is_daemon_alive(void)
 {
-	packet_create_json(json_object_new_object(), REQUEST_HANDSHAKE, NULL);
+	if (g_shell->daemon.is_alive)
+	{
+		printf("You are already connected to a ");
+		if (g_shell->daemon.domain == AF_LOCAL)
+			printf("local daemon %s\n", g_shell->daemon.addr.unix.sun_path);
+		else
+			printf("remote daemon %u\n",
+				   g_shell->daemon.addr.inet.sin_addr.s_addr);
+		printf("Execute `disconnect' command to drop connection\n");
+		return (1);
+	}
 	return (0);
 }

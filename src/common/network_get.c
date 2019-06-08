@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/28 12:09:17 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/07 11:57:35 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/08 14:58:11 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,8 +60,8 @@ int			get_next_packet(const int fd, char **content)
 		return (-1);
 	buf[fd] = buf[fd] == NULL ? ft_strnew(0) : buf[fd];
 	b = calloc(1, sizeof(char) * (BUFF_SIZE + 1));
-	while (strchr(buf[fd], PACKET_DELIMITER) == 0 && (cat = read(fd, b, BUFF_SIZE)) != 0
-	&& errno != EAGAIN)
+	while (strchr(buf[fd], PACKET_DELIMITER) == 0 &&
+		(cat = read(fd, b, BUFF_SIZE)) != 0 && errno != EAGAIN)
 	{
 		if (fd < 0 || cat == -1 || b == 0)
 			return (-1);
@@ -100,7 +100,8 @@ int			net_get(const int socket, struct s_packet **queue_head)
 	else if (status >= 0 && swap != NULL)
 	{
 		gettimeofday(&time, NULL);
-		packet_enqueue(queue_head, packet_create(socket, swap, time));
+		if (queue_head)
+			packet_enqueue(queue_head, packet_create(socket, swap, time));
 		ft_strdel(&swap);
 	}
 	return (status);

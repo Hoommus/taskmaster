@@ -13,6 +13,8 @@
 #include "shell_script.h"
 #include "shell_builtins.h"
 
+#define NO_CONNECTION SH ": You are not connected to any daemon\n"
+
 static int				run_builtin(const char **args)
 {
 	extern struct s_builtin	g_builtins[];
@@ -22,7 +24,12 @@ static int				run_builtin(const char **args)
 	while (args && args[0] && g_builtins[i].name)
 	{
 		if (ft_strcmp(args[0], g_builtins[i].name) == 0)
-			return (g_builtins[i].function((const char **)args + 1));
+		{
+			if (g_builtins[i].clazz == BUILTIN_REMOTE && !g_shell->daemon.is_alive)
+				return ((dprintf(2, NO_CONNECTION) & 0) | 1);
+			else
+				return (g_builtins[i].function((const char **)args + 1));
+		}
 		i++;
 	}
 	return (-512);

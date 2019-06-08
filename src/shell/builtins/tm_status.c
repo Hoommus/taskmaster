@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   daemon_status.c                                    :+:      :+:    :+:   */
+/*   tm_status.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/24 12:34:01 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/07 15:50:32 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/08 12:15:14 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ static struct s_packet		*pack_to_packet(enum e_request type, const char **args)
 {
 	json_object		*object;
 	json_object		*tmp;
-	struct timeval	time;
 	int				i;
 
 	object = json_object_new_object();
@@ -26,8 +25,7 @@ static struct s_packet		*pack_to_packet(enum e_request type, const char **args)
 	while (args && args[i])
 		json_object_array_add(tmp, json_object_new_string(args[i++]));
 	json_object_object_add(object, "argv", tmp);
-	gettimeofday(&time, NULL);
-	return (packet_create_json(object, type, time));
+	return (packet_create_json(object, type, NULL));
 }
 
 int			parse_response_status(const struct s_packet *packet)
@@ -74,13 +72,11 @@ int			tm_status(const char **args)
 	response = NULL;
 	if (args && args[0] && strcmp(args[0], "--help") == 0)
 		printf("Usage goes here\n");
-	else if (g_shell->daemon == NULL)
-		dprintf(2, "You need to connect to some daemon first\n");
-	else
+	else if (check_connection(g_shell->daemon.socket))
 	{
 		request = pack_to_packet(REQUEST_STATUS, args);
 		errno = 0;
-		if ((status = net_send(g_shell->daemon->socket_fd, request)) < 0)
+		if ((status = net_send(g_shell->daemon.socket, request)) < 0)
 			dprintf(2, SH ": failed to send request: %s\n",
 				errno == EPIPE ? "server dropped connection" : strerror(errno));
 		else if (status == 0 && errno != 0)
@@ -88,7 +84,7 @@ int			tm_status(const char **args)
 		else
 		{
 			queue = NULL;
-			if (net_get(g_shell->daemon->socket_fd, &queue) >= 0)
+			if (net_get(g_shell->daemon.socket, &queue) >= 0)
 				status = packet_resolve_all(queue);
 			else
 				dprintf(2, SH ": response timed out");

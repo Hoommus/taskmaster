@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:13:30 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/07 17:09:59 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/08 13:37:53 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,6 @@
 struct				s_thread_pool
 {
 	pthread_t		thread[THREAD_POOL_CAPACITY];
-	struct s_packet	*packet_queues[THREAD_POOL_CAPACITY];
 	void			*args[THREAD_POOL_CAPACITY];
 	bool			is_busy[THREAD_POOL_CAPACITY];
 	int				threads_number;
@@ -183,17 +182,21 @@ extern struct s_master		*g_master;
 struct s_socket		*socket_create_local(const char *filename);
 struct s_socket		*socket_create_inet(const char *address);
 
-int				read_fd(const int fd, char **result);
-int				read_filename(const char *file, char **data);
+int					read_fd(const int fd, char **result);
+int					read_filename(const char *file, char **data);
 
 /*
 ** Network interactions
 */
 void __attribute__((noreturn))	*accept_pthread_loop(void *socket);
 
-int				respond_status(const struct s_packet *packet);
-int				respond_invalid(const struct s_packet *packet);
-int				respond_stop(const struct s_packet *packet);
+int					serve_handshake(const struct s_packet *packet);
+int					serve_status(const struct s_packet *packet);
+int					serve_invalid(const struct s_packet *packet);
+int					serve_stop(const struct s_packet *packet);
+int					serve_start(const struct s_packet *packet);
+int					serve_restart(const struct s_packet *packet);
+int					serve_banish(const struct s_packet *packet);
 
 /*
 ** Network Thread Pool

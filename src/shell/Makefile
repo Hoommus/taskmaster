@@ -75,7 +75,9 @@ BUILTIN_SRC = builtins.c \
               tm_connect.c \
               tm_echo.c \
               tm_status.c \
-              tm_stop.c
+              tm_stop.c \
+              tm_banish.c \
+              tm_disconnect.c
 
 INTERFACE_DIR = line_editing/
 INTERFACE_SRC = buffer_drawing.c buffer_input.c  \

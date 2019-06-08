@@ -1,0 +1,21 @@
+.\" Manpage for taskmaster.
+.\" Contact vlad.from.ukraine2@gmail.com to correct errors or typos.
+.TH man 8 "07 June 2019" "1.0" "taskmaster man page"
+.SH NAME
+taskmasterd - launch new daemon instance
+.br
+taskmaster-cli - deamon's client
+.SH SYNOPSIS
+taskmasterd [--help]
+.SH DESCRIPTION
+Taskmaster is a highlevel utility for controlling process lifecycles.
+.SH OPTIONS
+taskmasterd allows you to specify config files and logfile location
+.br
+taskmaster-cli does not take any options
+.SH BUGS
+No known bugs.
+.SH AUTHORS
+Vladislav Tarasiuk (github.com/Hoommus) vlad.from.ukraine2@gmail.com
+.br
+Oleg Bamzurov (github.com/obamzuro)

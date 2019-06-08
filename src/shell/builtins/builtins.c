@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:42 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/07 16:18:42 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/07 22:27:29 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ struct s_resolver	g_resolvers[] = {
 
 struct s_builtin	g_builtins[] = {
 	{ "connect",    &tm_connect,    NULL,                      BUILTIN_SHELL  },
+	{ "banish",     &tm_banish,     NULL,                      BUILTIN_REMOTE },
 	{ "disconnect", &tm_disconnect, NULL,                      BUILTIN_REMOTE },
 	{ "drop",       &tm_disconnect, NULL,                      BUILTIN_REMOTE },
 	{ "exit",       &hs_exit,       NULL,                      BUILTIN_SHELL  },
@@ -37,19 +38,19 @@ int					hs_echo(const char **args)
 {
 	char	*str;
 
-	if (g_shell->daemon == NULL)
+	if (!g_shell->daemon.is_alive)
 	{
 		ft_dprintf(2, "You are not connected to any Taskmaster\n");
 		return (2);
 	}
 	if (args == NULL || args[0] == NULL)
 	{
-		ft_dprintf(g_shell->daemon->socket_fd, "\n");
+		ft_dprintf(g_shell->daemon.socket, "\n");
 		ft_dprintf(1, "\n");
 		return (0);
 	}
 	str = ft_strarr_join(" ", (char **)args);
-	ft_dprintf(g_shell->daemon->socket_fd, "%s\n", str);
+	ft_dprintf(g_shell->daemon.socket, "%s\n", str);
 	ft_dprintf(1, "%s\n", str);
 	free(str);
 	return (0);

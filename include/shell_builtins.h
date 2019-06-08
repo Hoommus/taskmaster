@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:22 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/07 16:16:28 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/07 21:40:04 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ struct					s_builtin
 	enum e_builtin_class	clazz;
 };
 
-void					print_var(const t_var *var);
+int						is_daemon_alive(void);
 
 /*
 ** Builtins (builtins/ *.c)
@@ -45,6 +45,8 @@ int						hs_exit(const char **args);
 int						hs_where(const char **args);
 int						hs_history(const char **args);
 int						hs_tokenizer(const char **args);
+
+int						tm_banish(const char **args);
 
 int						tm_status(const char **args);
 int						tm_status_help(void);

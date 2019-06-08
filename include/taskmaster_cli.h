@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/31 16:13:21 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/07 22:29:48 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,8 +179,7 @@ typedef struct			s_remote
 {
 	bool				is_alive;
 	int					domain;
-	int					socket_fd;
-	int					connection_fd;
+	int					socket;
 	union
 	{
 		struct sockaddr_un	unix;
@@ -217,7 +216,7 @@ struct					s_shell
 
 	t_buffer			*buffer;
 
-	t_remote			*daemon;
+	t_remote			daemon;
 };
 
 extern volatile sig_atomic_t	g_interrupt;
@@ -275,6 +274,13 @@ int						read_fd(const int fd, char **result);
 bool					is_dir(const char *path);
 bool					is_string_numeric(const char *str, const int base);
 _Noreturn int			fatal(const char *const cause);
+
+
+
+
+
+
+int						check_connection(int socket);
 /*
 ** Final input parsing (variables_replacement.c)
 */

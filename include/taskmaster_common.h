@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/24 12:40:25 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/06 12:45:59 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/08 10:31:38 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@
 # include <errno.h>
 
 # include <fcntl.h>
+# include <poll.h>
 
 # include <pthread.h>
 
@@ -49,7 +50,7 @@
 
 enum					e_request
 {
-	REQUEST_HEARTBEAT    = 0,
+	REQUEST_HANDSHAKE    = 0,
 	REQUEST_STATUS       = 1,
 	REQUEST_STOP         = 2,
 	REQUEST_START        = 4,
@@ -107,7 +108,7 @@ typedef struct			s_remote_alt
 extern struct s_resolver	g_resolvers[];
 
 struct s_packet	*packet_create(int socket, const char *contents, struct timeval timestamp);
-struct s_packet	*packet_create_json(json_object *root, enum e_request request, struct timeval timestamp);
+struct s_packet	*packet_create_json(json_object *content, enum e_request request, const struct timeval *timestamp);
 int				packet_enqueue(struct s_packet **queue_head, struct s_packet *packet);
 int				packet_dequeue(struct s_packet *packet);
 int				packet_free(struct s_packet **packet);

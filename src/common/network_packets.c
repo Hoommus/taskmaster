@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/31 13:19:08 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/06 20:15:55 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/07 22:30:39 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,21 +40,26 @@ struct s_packet	*packet_create(int socket, const char *contents, struct timeval 
 }
 
 struct s_packet	*packet_create_json(json_object *content,
-									enum e_request request,
-									const struct timeval timestamp)
+									   enum e_request request,
+									   const struct timeval *timestamp)
 {
 	struct s_packet		*packet;
+	struct timeval		timeval;
 
+	if (timestamp == NULL)
+		gettimeofday(&timeval, NULL);
+	else
+		memcpy(&timeval, timestamp, sizeof(timeval));
 	packet = calloc(1, sizeof(struct s_packet));
 	if (packet == NULL)
 		return (NULL);
 	packet->content = NULL;
-	packet->timestamp = timestamp;
+	packet->timestamp = timeval;
 	packet->json_content = content;
 	packet->is_content_parsed = true;
 	json_object_object_add(content, "request", json_object_new_int(request));
-	json_object_object_add(content, "packet_time_sec", json_object_new_int64(timestamp.tv_sec));
-	json_object_object_add(content, "packet_time_usec", json_object_new_int64(timestamp.tv_usec));
+	json_object_object_add(content, "packet_time_sec", json_object_new_int64(timeval.tv_sec));
+	json_object_object_add(content, "packet_time_usec", json_object_new_int64(timeval.tv_usec));
 	packet->request = request;
 	return (packet);
 }

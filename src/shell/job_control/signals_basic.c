@@ -39,6 +39,11 @@ static void				resize(int sig)
 	}
 }
 
+void					sigpipe(int sig)
+{
+	printf("Fuck, sigpipe(%d)!\n", sig);
+}
+
 #if defined(__linux__)
 
 void					setup_signal_handlers(void)
@@ -51,7 +56,7 @@ void					setup_signal_handlers(void)
 	action.sa_handler = &handle_sigint;
 	sigaction(SIGINT, &action, NULL);
 	signal(SIGWINCH, &resize);
-	signal(SIGPIPE, &tstp);
+	signal(SIGPIPE, &sigpipe);
 	signal(SIGCHLD, SIG_DFL);
 }
 
@@ -67,7 +72,7 @@ void					setup_signal_handlers(void)
 	action.__sigaction_u.__sa_handler = &handle_sigint;
 	sigaction(SIGINT, &action, NULL);
 	signal(SIGWINCH, &resize);
-	signal(SIGPIPE, &tstp);
+	signal(SIGPIPE, &sigpipe);
 	signal(SIGCHLD, SIG_DFL);
 }
 
