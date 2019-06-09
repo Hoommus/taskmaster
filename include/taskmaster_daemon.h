@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 12:13:30 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/08 13:37:53 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/07 17:35:05 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,4 +223,7 @@ void			d_restart();
 
 extern t_ftvector			*g_jobs;
 void			sigchld_handler(void);
+
+void		d_stop(const unsigned int job_num, const unsigned int process_num);
+void		alrm_handler(int signo __attribute__((unused)));
 #endif
