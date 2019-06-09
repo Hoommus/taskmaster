@@ -39,7 +39,6 @@ void __attribute__((noreturn))	*receive_respond(void *arg)
 	pthread_exit(NULL);
 }
 
-// TODO: add socket timeouts
 void __attribute__((noreturn))	*accept_pthread_loop(void *socket)
 {
 	const int					sock = *((int *)socket);

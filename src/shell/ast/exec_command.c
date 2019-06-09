@@ -28,7 +28,7 @@ static int				run_builtin(const char **args)
 			if (g_builtins[i].clazz == BUILTIN_REMOTE && !g_shell->daemon.is_alive)
 				return ((dprintf(2, NO_CONNECTION) & 0) | 1);
 			else
-				return (g_builtins[i].function((const char **)args + 1));
+				return (g_builtins[i].function(args + 1));
 		}
 		i++;
 	}

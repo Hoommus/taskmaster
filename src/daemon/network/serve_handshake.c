@@ -19,7 +19,7 @@ int							serve_handshake(const struct s_packet *packet)
 
 	log_write(TLOG_DEBUG, "Received handshake request");
 	root = json_object_new_object();
-	json_object_object_add(root, "handshake", json_object_new_string("Nice to meet you too."));
+	json_object_object_add(root, "handshake", json_object_new_string(HANDSHAKE_RESPONSE));
 	response = packet_create_json(root, packet->request, NULL);
 	if (net_send(packet->respond_to, response) == -1)
 		log_fwrite(TLOG_WARN, "Failed to answer to a handshake request: %s", strerror(errno));

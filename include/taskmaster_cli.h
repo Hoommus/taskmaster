@@ -276,11 +276,6 @@ bool					is_string_numeric(const char *str, const int base);
 _Noreturn int			fatal(const char *const cause);
 
 
-
-
-
-
-int						check_connection(int socket);
 /*
 ** Final input parsing (variables_replacement.c)
 */

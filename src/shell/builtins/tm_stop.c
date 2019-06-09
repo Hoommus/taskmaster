@@ -21,6 +21,11 @@ static struct s_packet	*pack_to_packet(enum e_request type, const char **args)
 	return (packet_create_json(object, type, NULL));
 }
 
+int						tm_stop_response(struct s_packet *packet)
+{
+	return (packet == 0);
+}
+
 // $ stop foo:foo_1
 
 int						tm_stop(const char **args)

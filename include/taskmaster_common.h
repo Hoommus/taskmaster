@@ -43,8 +43,9 @@
 #  undef unix
 # endif
 
-
 # define PACKET_DELIMITER 23
+# define HANDSHAKE_REQUEST "Hello, nice to meet you."
+# define HANDSHAKE_RESPONSE "Nice to meet you too."
 
 # define RESPONSE_TIMEOUT_USECONDS
 

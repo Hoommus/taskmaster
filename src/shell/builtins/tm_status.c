@@ -72,7 +72,7 @@ int			tm_status(const char **args)
 	response = NULL;
 	if (args && args[0] && strcmp(args[0], "--help") == 0)
 		printf("Usage goes here\n");
-	else if (check_connection(g_shell->daemon.socket))
+	else
 	{
 		request = pack_to_packet(REQUEST_STATUS, args);
 		errno = 0;

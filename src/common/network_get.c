@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/28 12:09:17 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/08 14:58:11 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/09 14:30:57 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,6 @@ int			get_next_packet(const int fd, char **content)
 ** Reads data from the socket packet-by-packet and adds them all into a queue
 */
 
-// TODO: try to reconnect / reaccept, if it is even possible
 // TODO: reject "old" packets or decide what to do with them
 int			net_get(const int socket, struct s_packet **queue_head)
 {
@@ -104,7 +103,7 @@ int			net_get(const int socket, struct s_packet **queue_head)
 			packet_enqueue(queue_head, packet_create(socket, swap, time));
 		ft_strdel(&swap);
 	}
-	return (status);
+	return (status && errno != EAGAIN);
 }
 
 
